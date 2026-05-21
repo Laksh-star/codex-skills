@@ -1,0 +1,4 @@
+interface:
+  display_name: "CopilotKit Workflow UI Builder"
+  short_description: "Add a CopilotKit UI around an existing workflow or backend."
+  default_prompt: "Use this skill to inspect the current app and build or plan a CopilotKit workflow UI with shared context, frontend tools, structured UI, approval gates, backend integration, validation, and handoff notes."
