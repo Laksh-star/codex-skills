@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Plugin Packaging"
+  short_description: "Turn an existing project into a repo-local Codex plugin."
+  default_prompt: "Use this skill to inspect the current repo and package or refine a shareable Codex plugin with repo-grounded metadata, skills, scripts, install docs, validation, and clean git handling."

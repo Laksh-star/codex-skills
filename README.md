@@ -1,25 +1,27 @@
-# Codex Skills Lab
+# Codex Skills
 
-![Codex Skills](https://img.shields.io/badge/Codex-Skills%20Lab-111827?style=for-the-badge)
+![Codex Skills](https://img.shields.io/badge/Codex-Skills-111827?style=for-the-badge)
 ![Workflow UI](https://img.shields.io/badge/Agentic%20UI-Workflow%20First-2563eb?style=for-the-badge)
 ![CopilotKit](https://img.shields.io/badge/CopilotKit-Ready-10b981?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Lab%20Quality-f59e0b?style=for-the-badge)
+![Plugins](https://img.shields.io/badge/Plugins-Repo%20Packaging-7c3aed?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
 
-This repo starts with a practical CopilotKit workflow skill: a repeatable way to wrap an existing backend, internal tool, or decision process with a Copilot-powered UI that can read app state, operate frontend tools, render structured workflow surfaces, and preserve explicit human approval gates.
+This repo collects practical skills built from real Codex work: workflow-first CopilotKit interfaces, repo-local plugin packaging, and other repeatable engineering patterns that are useful beyond a single project.
 
 ## Skills
 
 | Skill | Purpose | Status |
 | --- | --- | --- |
 | [`copilotkit-workflow-ui-builder`](skills/copilotkit-workflow-ui-builder/SKILL.md) | Add a CopilotKit UI around an existing workflow or backend. | Validated locally |
+| [`repo-plugin-packaging`](skills/repo-plugin-packaging/SKILL.md) | Turn an existing project into a shareable repo-local Codex plugin. | Validated locally |
 
 ## Why This Exists
 
 Most agent UI examples start as chat-first demos. These skills are meant for the harder and more useful path: start with an existing workflow, then add an AI interface that understands the product state and helps move real work forward.
 
-The pattern is:
+The working pattern is:
 
 1. Inspect the existing app and backend.
 2. Map workflow state into copilot context.
@@ -36,6 +38,7 @@ From this repo:
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R skills/copilotkit-workflow-ui-builder "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/repo-plugin-packaging "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -47,9 +50,12 @@ If you have the Codex skill creator tools available:
 ```bash
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/copilotkit-workflow-ui-builder
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/repo-plugin-packaging
 ```
 
-The first skill was validated locally before being added here.
+Each published skill is validated locally before being added here.
 
 ## Repository Standards
 
