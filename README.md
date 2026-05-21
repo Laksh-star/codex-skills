@@ -4,6 +4,7 @@
 ![Workflow UI](https://img.shields.io/badge/Agentic%20UI-Workflow%20First-2563eb?style=for-the-badge)
 ![CopilotKit](https://img.shields.io/badge/CopilotKit-Ready-10b981?style=for-the-badge)
 ![Plugins](https://img.shields.io/badge/Plugins-Repo%20Packaging-7c3aed?style=for-the-badge)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Remote%20MCP-f97316?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
@@ -16,6 +17,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 | --- | --- | --- |
 | [`copilotkit-workflow-ui-builder`](skills/copilotkit-workflow-ui-builder/SKILL.md) | Add a CopilotKit UI around an existing workflow or backend. | Validated locally |
 | [`repo-plugin-packaging`](skills/repo-plugin-packaging/SKILL.md) | Turn an existing project into a shareable repo-local Codex plugin. | Validated locally |
+| [`cloudflare-remote-mcp-worker`](skills/cloudflare-remote-mcp-worker/SKILL.md) | Deploy an MCP-capable repo as a Cloudflare Worker with remote `/mcp` verification. | Validated locally |
 
 ## Why This Exists
 
@@ -39,6 +41,7 @@ From this repo:
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R skills/copilotkit-workflow-ui-builder "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/repo-plugin-packaging "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/cloudflare-remote-mcp-worker "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -53,6 +56,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/repo-plugin-packaging
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/cloudflare-remote-mcp-worker
 ```
 
 Each published skill is validated locally before being added here.

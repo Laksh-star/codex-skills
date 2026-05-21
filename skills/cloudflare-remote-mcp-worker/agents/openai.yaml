@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cloudflare Remote MCP Worker"
+  short_description: "Deploy an MCP-capable repo as a Cloudflare Worker with a remote /mcp endpoint."
+  default_prompt: "Use this skill to inspect the current MCP-capable repo and plan or build a Cloudflare Worker deployment with /mcp, /health, auth notes, smoke tests, docs, and repo-safe handoff steps."
