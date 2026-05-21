@@ -74,6 +74,8 @@ Each published skill is validated locally before being added here.
 
 See [publishing guidelines](docs/publishing-guidelines.md) and the [release checklist template](templates/skill-release-checklist.md).
 
+Potential future skills are tracked in the [candidate backlog](candidate-skills/backlog.md). These are intentionally separate from `skills/` until they are cleaned and validated for public reuse.
+
 ## Suggested GitHub About Fields
 
 GitHub description:
