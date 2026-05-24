@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bumblebee Inventory"
+  short_description: "Run Bumblebee package/MCP scans and generate raw, public, and agent-ready reports."
+  default_prompt: "Use this skill to run a Bumblebee inventory scan against the current repo or explicit roots, preserve raw NDJSON, generate sanitized public reports, and produce AI coding agent handoff notes."

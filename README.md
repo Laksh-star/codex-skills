@@ -18,6 +18,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 | [`copilotkit-workflow-ui-builder`](skills/copilotkit-workflow-ui-builder/SKILL.md) | Add a CopilotKit UI around an existing workflow or backend. | Validated locally |
 | [`repo-plugin-packaging`](skills/repo-plugin-packaging/SKILL.md) | Turn an existing project into a shareable repo-local Codex plugin. | Validated locally |
 | [`cloudflare-remote-mcp-worker`](skills/cloudflare-remote-mcp-worker/SKILL.md) | Deploy an MCP-capable repo as a Cloudflare Worker with remote `/mcp` verification. | Validated locally |
+| [`bumblebee-inventory`](skills/bumblebee-inventory/SKILL.md) | Run Bumblebee package/MCP inventory scans and generate raw, public, and agent-ready reports. | Validated locally |
 
 ## Why This Exists
 
@@ -42,6 +43,7 @@ mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R skills/copilotkit-workflow-ui-builder "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/repo-plugin-packaging "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/cloudflare-remote-mcp-worker "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/bumblebee-inventory "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -59,6 +61,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/cloudflare-remote-mcp-worker
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/bumblebee-inventory
 ```
 
 Each published skill is validated locally before being added here.
