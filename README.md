@@ -5,6 +5,7 @@
 ![CopilotKit](https://img.shields.io/badge/CopilotKit-Ready-10b981?style=for-the-badge)
 ![Plugins](https://img.shields.io/badge/Plugins-Repo%20Packaging-7c3aed?style=for-the-badge)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Remote%20MCP-f97316?style=for-the-badge)
+![Content OS](https://img.shields.io/badge/Content%20OS-Codex%20Threads-14b8a6?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
@@ -19,6 +20,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 | [`repo-plugin-packaging`](skills/repo-plugin-packaging/SKILL.md) | Turn an existing project into a shareable repo-local Codex plugin. | Validated locally |
 | [`cloudflare-remote-mcp-worker`](skills/cloudflare-remote-mcp-worker/SKILL.md) | Deploy an MCP-capable repo as a Cloudflare Worker with remote `/mcp` verification. | Validated locally |
 | [`bumblebee-inventory`](skills/bumblebee-inventory/SKILL.md) | Run Bumblebee package/MCP inventory scans and generate raw, public, and agent-ready reports. | Validated locally |
+| [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
 
 ## Why This Exists
 
@@ -44,6 +46,7 @@ cp -R skills/copilotkit-workflow-ui-builder "${CODEX_HOME:-$HOME/.codex}/skills/
 cp -R skills/repo-plugin-packaging "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/cloudflare-remote-mcp-worker "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/bumblebee-inventory "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/content-os-manager "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -64,6 +67,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/bumblebee-inventory
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/content-os-manager
 ```
 
 Each published skill is validated locally before being added here.
