@@ -1,0 +1,4 @@
+interface:
+  display_name: "Competitive Intelligence Agent"
+  short_description: "Run agentic competitive intelligence demos."
+  default_prompt: "Use $competitive-intelligence-agent to run a sample or live CocoIndex competitive intelligence workflow."

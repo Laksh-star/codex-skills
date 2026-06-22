@@ -6,11 +6,12 @@
 ![Plugins](https://img.shields.io/badge/Plugins-Repo%20Packaging-7c3aed?style=for-the-badge)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Remote%20MCP-f97316?style=for-the-badge)
 ![Content OS](https://img.shields.io/badge/Content%20OS-Codex%20Threads-14b8a6?style=for-the-badge)
+![Competitive Intelligence](https://img.shields.io/badge/Competitive%20Intel-MCP%20%2B%20CocoIndex-0f766e?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
 
-This repo collects practical skills built from real Codex work: workflow-first CopilotKit interfaces, repo-local plugin packaging, and other repeatable engineering patterns that are useful beyond a single project.
+This repo collects practical skills built from real Codex work: workflow-first CopilotKit interfaces, repo-local plugin packaging, agent-facing competitive intelligence, and other repeatable engineering patterns that are useful beyond a single project.
 
 ## Skills
 
@@ -21,6 +22,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 | [`cloudflare-remote-mcp-worker`](skills/cloudflare-remote-mcp-worker/SKILL.md) | Deploy an MCP-capable repo as a Cloudflare Worker with remote `/mcp` verification. | Validated locally |
 | [`bumblebee-inventory`](skills/bumblebee-inventory/SKILL.md) | Run Bumblebee package/MCP inventory scans and generate raw, public, and agent-ready reports. | Validated locally |
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
+| [`competitive-intelligence-agent`](skills/competitive-intelligence-agent/SKILL.md) | Operate sample-first and live CocoIndex-backed competitive intelligence through MCP tools. | Validated locally |
 
 ## Why This Exists
 
@@ -36,6 +38,17 @@ The working pattern is:
 6. Validate with real build, smoke, and browser checks where possible.
 7. Produce handoff notes that a builder or community reader can reuse.
 
+## Featured Workflow: Competitive Intelligence Agent
+
+The [`competitive-intelligence-agent`](skills/competitive-intelligence-agent/SKILL.md) skill captures an agent-first pattern for market monitoring:
+
+```text
+Sample articles -> local analyzer -> MCP tools -> brief/dashboard
+Tavily -> CocoIndex -> Postgres -> MCP tools -> Claude/Codex/other agents
+```
+
+Use it when you want a dependable no-key demo first, then a live CocoIndex proof path with explicit competitor arguments such as `competitors="Apple,Microsoft"` or `competitors=["Perplexity", "Glean"]`. The skill keeps generated reports local, protects `.env` secrets, and gives agents the exact tool-call flow for creating briefs and dashboards.
+
 ## Install A Skill Locally
 
 From this repo:
@@ -47,6 +60,7 @@ cp -R skills/repo-plugin-packaging "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/cloudflare-remote-mcp-worker "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/bumblebee-inventory "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/content-os-manager "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/competitive-intelligence-agent "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -70,6 +84,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/content-os-manager
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/competitive-intelligence-agent
 ```
 
 Each published skill is validated locally before being added here.
@@ -81,9 +98,9 @@ Each published skill is validated locally before being added here.
 - Keep `SKILL.md` concise and action-oriented.
 - Put deeper workflow details in `references/`.
 - Avoid repo-specific secrets, private paths, and fragile local assumptions.
-- Add a release checklist entry before publishing a skill publicly.
+- Add a release checklist entry before publishing a skill publicly, using `docs/release-checklists/`.
 
-See [publishing guidelines](docs/publishing-guidelines.md) and the [release checklist template](templates/skill-release-checklist.md).
+See [publishing guidelines](docs/publishing-guidelines.md), the [release checklist template](templates/skill-release-checklist.md), and the [`competitive-intelligence-agent` checklist](docs/release-checklists/competitive-intelligence-agent.md).
 
 Only validated, reusable skills are published under `skills/`.
 
