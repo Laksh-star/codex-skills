@@ -23,6 +23,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 | [`bumblebee-inventory`](skills/bumblebee-inventory/SKILL.md) | Run Bumblebee package/MCP inventory scans and generate raw, public, and agent-ready reports. | Validated locally |
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
 | [`competitive-intelligence-agent`](skills/competitive-intelligence-agent/SKILL.md) | Operate sample-first and live CocoIndex-backed competitive intelligence through MCP tools. | Validated locally |
+| [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
 
 ## Why This Exists
 
@@ -61,9 +62,36 @@ cp -R skills/cloudflare-remote-mcp-worker "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/bumblebee-inventory "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/content-os-manager "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/competitive-intelligence-agent "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
+
+### Wiki Maintainer Setup
+
+To use the LLM Wiki skill on your own machine:
+
+```bash
+git clone https://github.com/Laksh-star/codex-skills.git
+cd codex-skills
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+Start a new Codex session and ask:
+
+```text
+Use wiki-maintainer to set up my LLM Wiki at ~/knowledge-wiki.
+```
+
+Codex will ask for your domains, whether to enable voice capture, and whether to initialize git. After setup, drop sources into `raw/` and ask Codex to compile, lint, query, generate outputs, or refresh `agent_exports/`.
+
+Optional local tools:
+
+- Python 3.10+ for the bundled helper scripts.
+- git for version history.
+- Obsidian or any markdown editor for reading the wiki.
+- `pdftotext` from Poppler when you want to ingest PDFs.
 
 ## Validate A Skill
 
@@ -87,6 +115,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/competitive-intelligence-agent
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/wiki-maintainer
 ```
 
 Each published skill is validated locally before being added here.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wiki Maintainer"
+  short_description: "Build and maintain a local interlinked LLM Wiki from raw sources."
+  default_prompt: "Use this skill to set up or maintain a markdown LLM Wiki: ingest raw sources, create linked articles, lint backlinks and frontmatter, answer questions with citations, generate outputs, and refresh agent exports."
