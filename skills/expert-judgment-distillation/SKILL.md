@@ -46,6 +46,7 @@ Read `references/bridgewater-tinker-process-map.md` before answering. Use it to 
 - Read `references/dataset-schemas.md` when creating JSONL/CSV schemas, rubric fields, or output formats.
 - Read `references/eval-metrics.md` when choosing metrics, gates, and failure reports.
 - Read `references/case-study-template.md` when drafting a public or internal case study.
+- Read `references/extension-playbook.md` when the user asks what else to add, how to make the workflow more visual, or how to mature the skill into a stronger ML/eval toolkit.
 
 ## Validation Helper
 
