@@ -18,6 +18,7 @@ Date: 2026-07-02
 - [x] `references/dataset-schemas.md`
 - [x] `references/eval-metrics.md`
 - [x] `references/case-study-template.md`
+- [x] `references/extension-playbook.md`
 - [x] `scripts/validate_judgment_dataset.py`
 
 ## Validation
