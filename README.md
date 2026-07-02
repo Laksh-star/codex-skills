@@ -16,16 +16,34 @@ This repo collects practical skills built from real Codex work: workflow-first C
 
 ## Skills
 
+### Model & Evaluation Workflows
+
+Skills for domain-specific ML workflows, eval design, dataset loops, and model-quality case studies.
+
+| Skill | Purpose | Status |
+| --- | --- | --- |
+| [`expert-judgment-distillation`](skills/expert-judgment-distillation/SKILL.md) | Build expert-judgment datasets, evals, repair loops, rubric models, and case-study writeups. | Validated locally |
+
+### Agent Systems & Workflow Apps
+
+Skills for building, operating, or packaging agent-facing software workflows.
+
 | Skill | Purpose | Status |
 | --- | --- | --- |
 | [`copilotkit-workflow-ui-builder`](skills/copilotkit-workflow-ui-builder/SKILL.md) | Add a CopilotKit UI around an existing workflow or backend. | Validated locally |
-| [`repo-plugin-packaging`](skills/repo-plugin-packaging/SKILL.md) | Turn an existing project into a shareable repo-local Codex plugin. | Validated locally |
-| [`cloudflare-remote-mcp-worker`](skills/cloudflare-remote-mcp-worker/SKILL.md) | Deploy an MCP-capable repo as a Cloudflare Worker with remote `/mcp` verification. | Validated locally |
+| [`competitive-intelligence-agent`](skills/competitive-intelligence-agent/SKILL.md) | Operate sample-first and live CocoIndex-backed competitive intelligence through MCP tools. | Validated locally |
 | [`bumblebee-inventory`](skills/bumblebee-inventory/SKILL.md) | Run Bumblebee package/MCP inventory scans and generate raw, public, and agent-ready reports. | Validated locally |
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
-| [`competitive-intelligence-agent`](skills/competitive-intelligence-agent/SKILL.md) | Operate sample-first and live CocoIndex-backed competitive intelligence through MCP tools. | Validated locally |
 | [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
-| [`expert-judgment-distillation`](skills/expert-judgment-distillation/SKILL.md) | Build expert-judgment datasets, evals, repair loops, rubric models, and case-study writeups. | Validated locally |
+
+### Plugin & Deployment Packaging
+
+Skills for turning local capabilities into shareable Codex plugins or hosted MCP surfaces.
+
+| Skill | Purpose | Status |
+| --- | --- | --- |
+| [`repo-plugin-packaging`](skills/repo-plugin-packaging/SKILL.md) | Turn an existing project into a shareable repo-local Codex plugin. | Validated locally |
+| [`cloudflare-remote-mcp-worker`](skills/cloudflare-remote-mcp-worker/SKILL.md) | Deploy an MCP-capable repo as a Cloudflare Worker with remote `/mcp` verification. | Validated locally |
 
 ## Why This Exists
 
