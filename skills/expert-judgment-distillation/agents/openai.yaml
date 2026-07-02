@@ -1,0 +1,4 @@
+interface:
+  display_name: "Expert Judgment Distillation"
+  short_description: "Build data and eval loops for domain expert judgment."
+  default_prompt: "Use $expert-judgment-distillation to design a domain expert judgment dataset, eval loop, and case-study plan."

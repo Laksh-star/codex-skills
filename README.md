@@ -7,6 +7,7 @@
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Remote%20MCP-f97316?style=for-the-badge)
 ![Content OS](https://img.shields.io/badge/Content%20OS-Codex%20Threads-14b8a6?style=for-the-badge)
 ![Competitive Intelligence](https://img.shields.io/badge/Competitive%20Intel-MCP%20%2B%20CocoIndex-0f766e?style=for-the-badge)
+![Expert Judgment](https://img.shields.io/badge/Expert%20Judgment-Distillation%20Loop-b91c1c?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
@@ -24,6 +25,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
 | [`competitive-intelligence-agent`](skills/competitive-intelligence-agent/SKILL.md) | Operate sample-first and live CocoIndex-backed competitive intelligence through MCP tools. | Validated locally |
 | [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
+| [`expert-judgment-distillation`](skills/expert-judgment-distillation/SKILL.md) | Build expert-judgment datasets, evals, repair loops, rubric models, and case-study writeups. | Validated locally |
 
 ## Why This Exists
 
@@ -50,6 +52,25 @@ Tavily -> CocoIndex -> Postgres -> MCP tools -> Claude/Codex/other agents
 
 Use it when you want a dependable no-key demo first, then a live CocoIndex proof path with explicit competitor arguments such as `competitors="Apple,Microsoft"` or `competitors=["Perplexity", "Glean"]`. The skill keeps generated reports local, protects `.env` secrets, and gives agents the exact tool-call flow for creating briefs and dashboards.
 
+## Featured Workflow: Expert Judgment Distillation
+
+The [`expert-judgment-distillation`](skills/expert-judgment-distillation/SKILL.md) skill captures a repeatable pattern for turning domain taste into a model-ready workflow:
+
+```mermaid
+flowchart LR
+  A["Expert decision"] --> B["Label taxonomy"]
+  B --> C["Seed dataset"]
+  C --> D["Prompt baseline"]
+  D --> E["Failure taxonomy"]
+  E --> F["Repair data"]
+  F --> G["Fine-tune or train"]
+  G --> H["Held-out evals"]
+  H --> I["Case study"]
+  H --> E
+```
+
+Use it for workflows where generic prompting is not enough: financial relevance, editorial triage, legal intake, content moderation, sales lead scoring, recruiting screens, or any repeated judgment task that needs held-out evidence and careful failure repair. The skill includes a cited Bridgewater/Tinker process-map reference while avoiding copyrighted article reuse or claims that it reproduces their exact training recipe.
+
 ## Install A Skill Locally
 
 From this repo:
@@ -63,6 +84,7 @@ cp -R skills/bumblebee-inventory "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/content-os-manager "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/competitive-intelligence-agent "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/expert-judgment-distillation "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -118,6 +140,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/wiki-maintainer
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/expert-judgment-distillation
 ```
 
 Each published skill is validated locally before being added here.
@@ -131,7 +156,7 @@ Each published skill is validated locally before being added here.
 - Avoid repo-specific secrets, private paths, and fragile local assumptions.
 - Add a release checklist entry before publishing a skill publicly, using `docs/release-checklists/`.
 
-See [publishing guidelines](docs/publishing-guidelines.md), the [release checklist template](templates/skill-release-checklist.md), and the [`competitive-intelligence-agent` checklist](docs/release-checklists/competitive-intelligence-agent.md).
+See [publishing guidelines](docs/publishing-guidelines.md), the [release checklist template](templates/skill-release-checklist.md), the [`competitive-intelligence-agent` checklist](docs/release-checklists/competitive-intelligence-agent.md), and the [`expert-judgment-distillation` checklist](docs/release-checklists/expert-judgment-distillation.md).
 
 Only validated, reusable skills are published under `skills/`.
 
