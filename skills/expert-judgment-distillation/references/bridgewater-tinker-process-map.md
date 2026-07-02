@@ -24,6 +24,38 @@ This workflow is inspired by the expert-judgment distillation pattern described 
 
 Important caveat: this skill generalizes the dataset, evaluation, failure-analysis, and case-study loop. It does not claim to implement the article's exact training recipe, including interleaved batching, CISPO loss with asymmetric clipping, or on-policy distillation.
 
+## Process Map
+
+```mermaid
+flowchart TD
+  A["Repeated expert judgment task"] --> B["Prompt baseline"]
+  B --> C{"Trust threshold met?"}
+  C -- "No" --> D["Seed dataset"]
+  D --> E["Train task model"]
+  E --> F["Held-out evals"]
+  F --> G["Failure taxonomy"]
+  G --> H["Contested examples"]
+  H --> I["Expert adjudication"]
+  I --> J["Repair dataset"]
+  J --> E
+  C -- "Yes" --> K["Use prompt with monitoring"]
+  F --> L["Case study and deployment decision"]
+```
+
+## Dataset Quality Loop
+
+```mermaid
+flowchart LR
+  A["Weak or seed labels"] --> B["Model predicts labels"]
+  B --> C["Compare model vs label"]
+  C --> D["Agreement examples"]
+  C --> E["Disagreements"]
+  E --> F["Expert review"]
+  F --> G["Correct labels or mark ambiguous"]
+  G --> H["Clean training set"]
+  H --> I["Held-out final eval"]
+```
+
 ## Mapping Template
 
 | Article Pattern | User Project Mapping |
