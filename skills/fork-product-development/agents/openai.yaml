@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fork Product Development"
+  short_description: "Maintain product forks and upstream PRs."
+  default_prompt: "Use $fork-product-development to plan a private fork branch and clean upstream PR path for this repo."

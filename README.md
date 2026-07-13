@@ -35,6 +35,7 @@ Skills for building, operating, or packaging agent-facing software workflows.
 | [`bumblebee-inventory`](skills/bumblebee-inventory/SKILL.md) | Run Bumblebee package/MCP inventory scans and generate raw, public, and agent-ready reports. | Validated locally |
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
 | [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
+| [`fork-product-development`](skills/fork-product-development/SKILL.md) | Maintain private product forks while preparing clean upstream PRs. | Validated locally |
 
 ### Plugin & Deployment Packaging
 
@@ -103,6 +104,7 @@ cp -R skills/content-os-manager "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/competitive-intelligence-agent "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/expert-judgment-distillation "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/fork-product-development "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -161,6 +163,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/expert-judgment-distillation
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/fork-product-development
 ```
 
 Each published skill is validated locally before being added here.
