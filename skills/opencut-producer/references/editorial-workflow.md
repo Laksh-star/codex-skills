@@ -55,6 +55,16 @@ Do not expose invented numeric confidence as objective truth. Use the score only
 - Use SRT or VTT; the current renderer muxes captions into MP4 as a selectable subtitle track.
 - Verify the final caption cue does not extend beyond the rendered duration.
 
+## Layered plans
+
+- Use v2 only when a supplied asset has a clear editorial purpose; do not add layers merely to make a clip look busier.
+- Keep the interview or narrative spine in the primary clips.
+- Use overlay tracks for B-roll, picture-in-picture, demonstrations, or cutaway repair.
+- Keep overlay placement inside the output canvas and verify legibility at the target aspect ratio.
+- Use independent audio tracks for supplied music, ambience, or secondary narration.
+- Start secondary audio at low volume because automatic ducking is not implemented yet.
+- Compile and preview every layered plan; JSON inspection alone cannot verify visual occlusion or audio balance.
+
 ## Large local videos
 
 - Do not load the full media file into model context.

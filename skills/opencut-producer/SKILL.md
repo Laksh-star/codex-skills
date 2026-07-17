@@ -1,6 +1,6 @@
 ---
 name: opencut-producer
-description: Turn a local video and plain-English editorial brief into multiple isolated OpenCut edit candidates, captions, an opaque review session, and a human-approved local render. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; create short clips or aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; or continue a previously created OpenCut review session.
+description: Turn local video, audio, and optional B-roll plus a plain-English editorial brief into multiple isolated OpenCut edit candidates, captions, layered v2 compositions, an opaque review session, and a human-approved local render. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; arrange several generated clips; add timed B-roll or mixed audio; create short clips or aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; or continue a previously created OpenCut review session.
 ---
 
 # OpenCut Producer
@@ -22,6 +22,7 @@ Collect or infer:
 - target duration, default `30–90 seconds`;
 - target aspect ratio, default source ratio;
 - caption preference, default enabled;
+- optional B-roll/video overlays and independent audio assets;
 - OpenCut checkout path, if it cannot be discovered locally.
 
 Do not stop for optional choices. State sensible defaults and proceed. Ask only when the source is missing, the requested outcome materially conflicts with the source, or external transcription needs consent.
@@ -38,6 +39,14 @@ Do not stop for optional choices. State sensible defaults and proceed. Ask only 
    - Do not scan, expose, or reference unrelated sibling files.
 4. Keep source media and generated artifacts outside the OpenCut source repository.
 5. Confirm FFmpeg, FFprobe, the repo-pinned Bun executable, and web dependencies exist. Install only when the user has authorized dependency changes.
+6. Run the bridge setup packager once for the chosen root:
+
+```bash
+/absolute/path/to/OpenCut/apps/agent-bridge/bin/opencut-setup \
+  --root "/absolute/path/to/agent-root"
+```
+
+Reuse its generated `.opencut-agent/setup.json` and `codex-mcp.toml`; do not recreate configuration by hand or edit the user's global Codex config silently.
 
 ## 2. Transcribe safely
 
@@ -66,6 +75,13 @@ For every candidate:
 - map captions onto output-timeline time, not absolute source time;
 - write an isolated `edit-plan.json` and unique output path;
 - add a short title and decision-useful summary.
+
+Use plan version `1` for a strictly sequential single-source edit. Use version
+`2` when the user supplies or requests B-roll, picture-in-picture, multiple
+generated clips on overlapping layers, or an independent music/audio bed. Keep
+the main story in `timeline.clips`; place visual layers in `overlayTracks` and
+secondary audio in `audioTracks`. Never fake an asset that was not supplied or
+authorized.
 
 Follow `references/editorial-workflow.md` for scoring and caption rules.
 
@@ -100,7 +116,9 @@ When OpenCut MCP tools are available:
 1. Call `opencut_capabilities`.
 2. Inspect the source with `opencut_inspect_media`.
 3. Validate every plan with `opencut_validate_edit_plan`.
-4. Save plans only inside the chosen root.
+4. Use `opencut_upgrade_edit_plan` when an existing v1 candidate needs v2 layers.
+5. Compile every v2 plan and inspect the returned `overlay`/`amix` graph before saving it.
+6. Save plans only inside the chosen root.
 
 Always run the bundled session validator, resolving its path relative to this `SKILL.md`:
 
@@ -126,6 +144,10 @@ Return or open the printed `?session=<opaque-id>` URL. The browser should stream
 
 Keep the launcher alive while the user reviews candidates. If the bridge restarts, register the manifest again and use the new opaque URL; selection and rendered state remain in the manifest.
 
+For v2 plans, make the candidate summary name the B-roll and audio treatment.
+The current UI edits the primary A-roll and displays overlay/audio track counts;
+the complete compiled preview is the review artifact for the read-only layers.
+
 ## 7. Preserve the human gate
 
 - Candidate selection is not render approval.
@@ -145,8 +167,9 @@ After the UI reports completion:
 2. Inspect `opencut.project.json` and `approved-edit-plan.json` inside that candidate directory.
 3. Confirm the project record contains the candidate revision, plan hash, source hashes, creating agent/model when supplied, and the latest reviewer note.
 4. Run FFprobe on the MP4 and report duration, resolution, codecs, subtitle stream, and size.
-5. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
-6. Report exact output paths and any transcription or rendering limitations.
+5. For v2, verify that overlay timing/placement and each mixed audio input are present in the compiled graph and rendered preview.
+6. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
+7. Report exact output paths and any transcription or rendering limitations.
 
 ## Failure handling
 

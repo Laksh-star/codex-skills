@@ -12,6 +12,8 @@ from pathlib import Path, PurePosixPath
 VALID_STATUSES = {
     "ready-for-review",
     "selected",
+    "previewing",
+    "preview-ready",
     "rendering",
     "rendered",
     "failed",
@@ -54,6 +56,28 @@ def project_directory(output_path: str) -> PurePosixPath:
     return parent.parent if parent.name == "renders" else parent
 
 
+def validate_timed_clip(candidate_id: str, clip: object, asset_ids: set[str], clip_ids: set[str]) -> float:
+    if not isinstance(clip, dict):
+        fail(f"Candidate {candidate_id} has an invalid clip")
+    clip_id = clip.get("id")
+    asset_id = clip.get("assetId")
+    start = clip.get("sourceStart")
+    end = clip.get("sourceEnd")
+    speed = clip.get("speed", 1)
+    if not isinstance(clip_id, str) or not clip_id:
+        fail(f"Candidate {candidate_id} has a clip without id")
+    if clip_id in clip_ids:
+        fail(f"Candidate {candidate_id} has duplicate clip id {clip_id}")
+    if asset_id not in asset_ids:
+        fail(f"Candidate {candidate_id} clip {clip_id} references unknown asset")
+    if not all(isinstance(value, (int, float)) for value in (start, end, speed)):
+        fail(f"Candidate {candidate_id} clip {clip_id} has invalid timing")
+    if start < 0 or end <= start or speed <= 0:
+        fail(f"Candidate {candidate_id} clip {clip_id} has invalid range or speed")
+    clip_ids.add(clip_id)
+    return (end - start) / speed
+
+
 def validate(manifest_path: Path, root: Path) -> dict:
     manifest = load_json(manifest_path)
     if manifest.get("version") != "1":
@@ -67,7 +91,6 @@ def validate(manifest_path: Path, root: Path) -> dict:
         fail("candidates must be a non-empty array")
 
     source_ids: set[str] = set()
-    source_paths: set[str] = set()
     source_sizes: dict[str, int] = {}
     for source in sources:
         source_id = source.get("id") if isinstance(source, dict) else None
@@ -80,7 +103,6 @@ def validate(manifest_path: Path, root: Path) -> dict:
             fail(f"Source asset {source_id} needs a path")
         resolved = resolve_inside(root, source_path)
         source_ids.add(source_id)
-        source_paths.add(source_path)
         source_sizes[source_id] = resolved.stat().st_size
 
     candidate_ids: set[str] = set()
@@ -102,14 +124,14 @@ def validate(manifest_path: Path, root: Path) -> dict:
 
         plan_path = resolve_inside(root, plan_path_text)
         plan = load_json(plan_path)
-        if plan.get("version") != "1":
-            fail(f"Candidate {candidate_id} plan version must be '1'")
+        plan_version = plan.get("version")
+        if plan_version not in {"1", "2"}:
+            fail(f"Candidate {candidate_id} plan version must be '1' or '2'")
         output = plan.get("output")
         output_path = output.get("path") if isinstance(output, dict) else None
         if not isinstance(output_path, str) or not output_path.endswith(".mp4"):
             fail(f"Candidate {candidate_id} output must be an MP4 path")
         resolve_inside(root, output_path, must_exist=False)
-
         plan_parent = PurePosixPath(plan_path_text).parent
         if project_directory(output_path) != plan_parent:
             fail(
@@ -118,54 +140,80 @@ def validate(manifest_path: Path, root: Path) -> dict:
             )
 
         assets = plan.get("assets")
-        clips = plan.get("timeline", {}).get("clips")
+        timeline = plan.get("timeline")
+        clips = timeline.get("clips") if isinstance(timeline, dict) else None
         if not isinstance(assets, list) or not assets:
             fail(f"Candidate {candidate_id} needs assets")
         if not isinstance(clips, list) or not clips:
             fail(f"Candidate {candidate_id} needs timeline clips")
 
         asset_ids: set[str] = set()
+        asset_kinds: dict[str, str] = {}
         for asset in assets:
             asset_id = asset.get("id") if isinstance(asset, dict) else None
             asset_path = asset.get("path") if isinstance(asset, dict) else None
+            asset_kind = asset.get("kind") if isinstance(asset, dict) else None
             if not isinstance(asset_id, str) or not asset_id:
                 fail(f"Candidate {candidate_id} has an asset without id")
             if asset_id in asset_ids:
                 fail(f"Candidate {candidate_id} has duplicate asset id {asset_id}")
             if not isinstance(asset_path, str) or not asset_path:
                 fail(f"Candidate {candidate_id} asset {asset_id} needs a path")
+            if asset_kind not in {"video", "audio", "captions"}:
+                fail(f"Candidate {candidate_id} asset {asset_id} has invalid kind")
             resolve_inside(root, asset_path)
             asset_ids.add(asset_id)
+            asset_kinds[asset_id] = asset_kind
 
-        duration = 0.0
         clip_ids: set[str] = set()
+        primary_duration = 0.0
         for clip in clips:
-            if not isinstance(clip, dict):
-                fail(f"Candidate {candidate_id} has an invalid clip")
-            clip_id = clip.get("id")
-            asset_id = clip.get("assetId")
-            start = clip.get("sourceStart")
-            end = clip.get("sourceEnd")
-            speed = clip.get("speed", 1)
-            if not isinstance(clip_id, str) or not clip_id:
-                fail(f"Candidate {candidate_id} has a clip without id")
-            if clip_id in clip_ids:
-                fail(f"Candidate {candidate_id} has duplicate clip id {clip_id}")
-            if asset_id not in asset_ids:
-                fail(f"Candidate {candidate_id} clip {clip_id} references unknown asset")
-            if not all(isinstance(value, (int, float)) for value in (start, end, speed)):
-                fail(f"Candidate {candidate_id} clip {clip_id} has invalid timing")
-            if start < 0 or end <= start or speed <= 0:
-                fail(f"Candidate {candidate_id} clip {clip_id} has invalid range or speed")
-            duration += (end - start) / speed
-            clip_ids.add(clip_id)
+            duration = validate_timed_clip(candidate_id, clip, asset_ids, clip_ids)
+            if asset_kinds.get(clip["assetId"]) != "video":
+                fail(f"Candidate {candidate_id} primary clip {clip['id']} must use video")
+            primary_duration += duration
+
+        duration = primary_duration
+        overlay_count = 0
+        audio_count = 0
+        if plan_version == "2":
+            overlay_tracks = timeline.get("overlayTracks", [])
+            audio_tracks = timeline.get("audioTracks", [])
+            if not isinstance(overlay_tracks, list) or not isinstance(audio_tracks, list):
+                fail(f"Candidate {candidate_id} v2 tracks must be arrays")
+            track_ids: set[str] = set()
+            for track_kind, tracks in (("overlay", overlay_tracks), ("audio", audio_tracks)):
+                for track in tracks:
+                    track_id = track.get("id") if isinstance(track, dict) else None
+                    track_clips = track.get("clips") if isinstance(track, dict) else None
+                    if not isinstance(track_id, str) or not track_id or track_id in track_ids:
+                        fail(f"Candidate {candidate_id} has an invalid or duplicate track id")
+                    if not isinstance(track_clips, list) or not track_clips:
+                        fail(f"Candidate {candidate_id} track {track_id} needs clips")
+                    track_ids.add(track_id)
+                    for clip in track_clips:
+                        clip_duration = validate_timed_clip(candidate_id, clip, asset_ids, clip_ids)
+                        timeline_start = clip.get("timelineStart")
+                        if not isinstance(timeline_start, (int, float)) or timeline_start < 0:
+                            fail(f"Candidate {candidate_id} clip {clip.get('id')} needs timelineStart")
+                        asset_kind = asset_kinds.get(clip["assetId"])
+                        if track_kind == "overlay" and asset_kind != "video":
+                            fail(f"Candidate {candidate_id} overlay clip {clip['id']} must use video")
+                        if track_kind == "audio" and asset_kind not in {"audio", "video"}:
+                            fail(f"Candidate {candidate_id} audio clip {clip['id']} must use audio or video")
+                        duration = max(duration, timeline_start + clip_duration)
+                        overlay_count += track_kind == "overlay"
+                        audio_count += track_kind == "audio"
 
         candidate_ids.add(candidate_id)
         summaries.append(
             {
                 "id": candidate_id,
                 "status": status,
-                "clips": len(clips),
+                "planVersion": plan_version,
+                "primaryClips": len(clips),
+                "overlayClips": overlay_count,
+                "audioClips": audio_count,
                 "durationSeconds": round(duration, 3),
                 "outputPath": output_path,
             }

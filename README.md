@@ -115,14 +115,17 @@ Then start a new Codex session and ask for the skill by name, or ask for a task 
 
 ```text
 Use $opencut-producer to create three review candidates from
-/absolute/path/to/video.mp4 and open the OpenCut approval workspace.
+/absolute/path/to/video.mp4, layer the supplied B-roll and music where they
+support the story, and open the OpenCut approval workspace.
 ```
 
 Codex prepares differentiated candidates and starts the local review session. In
 OpenCut, adjust clip ranges, ordering, speed, volume, or caption inclusion; save
 the edit as a numbered revision; render and inspect its fast preview; then use
 the separate **Approve final** action for the high-quality local MP4. Selection,
-preview rendering, and final approval are deliberately separate decisions.
+preview rendering, and final approval are deliberately separate decisions. The
+skill uses schema v2 for supplied overlay/audio assets and keeps sequential-only
+requests on the compatible v1 contract.
 
 ### Wiki Maintainer Setup
 
