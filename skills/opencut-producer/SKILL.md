@@ -1,11 +1,11 @@
 ---
 name: opencut-producer
-description: Turn local video, audio, optional B-roll, and a plain-English editorial brief into multiple isolated OpenCut edit candidates with smart music ducking, transitions, title cards, styled captions, an opaque review session, and a human-approved local render. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; produce polished short clips; arrange several generated clips; add B-roll, music, subtitles, intros, outros, or lower thirds; create aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; or continue a previously created OpenCut review session.
+description: Turn local video, audio, optional B-roll, and a plain-English editorial brief into multiple isolated OpenCut edit candidates with smart music ducking, transitions, title cards, styled captions, editable production controls, an opaque review session, and human-approved single or batch local renders. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; produce polished short clips; arrange several generated clips; add B-roll, music, subtitles, intros, outros, or lower thirds; create aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; batch-render approved candidates; or continue a previously created OpenCut review session.
 ---
 
 # OpenCut Producer
 
-Create candidate edits automatically, but keep selection, preview rendering, final rendering, and publishing under explicit human control.
+Create candidate edits automatically, but keep selection, preview rendering, single final rendering, batch final rendering, and publishing under explicit human control.
 
 Read these references as needed:
 
@@ -155,18 +155,21 @@ Return or open the printed `?session=<opaque-id>` URL. The browser should stream
 Keep the launcher alive while the user reviews candidates. If the bridge restarts, register the manifest again and use the new opaque URL; selection and rendered state remain in the manifest.
 
 For v2 plans, make the candidate summary name the B-roll, music, transition,
-title, and caption treatment. The current UI edits the primary A-roll and
-displays the complete production summary; the compiled preview is the review
-artifact for the read-only secondary layers and styling.
+title, and caption treatment. The current UI edits the primary A-roll plus
+existing overlay, audio, transition, title-card, caption-style, and ducking
+fields. The compiled preview remains the review artifact for the exact saved
+revision.
 
 ## 7. Preserve the human gate
 
 - Candidate selection is not render approval.
+- Batch selection is not render approval.
 - Review edits must be saved as a new numbered revision; never silently mutate an approved plan.
 - A fast preview applies only to the exact revision that produced it. Any later edit invalidates it.
 - Never call the preview or final-approval endpoints or reuse the action token on the user's behalf.
 - Preview rendering must begin from the visible **Render preview** action.
 - Final rendering must begin from the separate visible **Approve final** action, after the reviewer inspects the current preview.
+- Batch rendering must begin from the separate visible **Approve batch** action, and only for candidates whose current revision already has a preview.
 - Never upload or publish a rendered clip as part of this skill.
 - Treat publishing as a separate workflow with destination-specific approval.
 
@@ -174,13 +177,14 @@ artifact for the read-only secondary layers and styling.
 
 After the UI reports completion:
 
-1. Confirm the selected candidate status is `rendered`, and that the audit history contains preview and final-render events for the approved revision.
-2. Inspect `opencut.project.json` and `approved-edit-plan.json` inside that candidate directory.
-3. Confirm the project record contains the candidate revision, plan hash, source hashes, creating agent/model when supplied, and the latest reviewer note.
-4. Run FFprobe on the MP4 and report duration, resolution, codecs, subtitle stream, and size.
-5. For v2, verify overlay timing/placement, mixed audio inputs, ducking, transitions, title cards, and caption styling in the compiled graph and rendered preview.
-6. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
-7. Report exact output paths and any transcription or rendering limitations.
+1. Confirm the selected or batch-approved candidate status is `rendered`, and that the audit history contains preview and final-render events for the approved revision.
+2. For a batch, confirm the latest `renderBatches` entry is `completed`; if it is `partial` or `failed`, report the failed candidate IDs and do not hide successful outputs.
+3. Inspect `opencut.project.json` and `approved-edit-plan.json` inside every rendered candidate directory.
+4. Confirm each project record contains the candidate revision, plan hash, source hashes, creating agent/model when supplied, and the latest reviewer note.
+5. Run FFprobe on each MP4 and report duration, resolution, codecs, subtitle stream, and size.
+6. For v2, verify overlay timing/placement, mixed audio inputs, ducking, transitions, title cards, and caption styling in the compiled graph and rendered preview.
+7. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
+8. Report exact output paths and any transcription or rendering limitations.
 
 ## Failure handling
 

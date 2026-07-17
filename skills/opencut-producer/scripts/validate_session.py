@@ -14,10 +14,13 @@ VALID_STATUSES = {
     "selected",
     "previewing",
     "preview-ready",
+    "queued",
     "rendering",
     "rendered",
     "failed",
 }
+VALID_BATCH_STATUSES = {"queued", "rendering", "completed", "partial", "failed"}
+VALID_BATCH_ITEM_STATUSES = {"queued", "rendering", "rendered", "failed"}
 
 
 def fail(message: str) -> None:
@@ -295,6 +298,42 @@ def validate(manifest_path: Path, root: Path) -> dict:
     if selected is not None and selected not in candidate_ids:
         fail(f"selectedCandidateId references unknown candidate: {selected}")
 
+    render_batches = manifest.get("renderBatches", [])
+    if not isinstance(render_batches, list):
+        fail("renderBatches must be an array when present")
+    batch_summaries: list[dict] = []
+    for batch in render_batches:
+        if not isinstance(batch, dict):
+            fail("Every render batch must be an object")
+        batch_id = batch.get("id")
+        batch_status = batch.get("status")
+        items = batch.get("items")
+        if not isinstance(batch_id, str) or not batch_id:
+            fail("Every render batch needs an id")
+        if batch_status not in VALID_BATCH_STATUSES:
+            fail(f"Invalid render batch status: {batch_status}")
+        if not isinstance(items, list) or not items:
+            fail(f"Render batch {batch_id} needs items")
+        seen_batch_candidates: set[str] = set()
+        item_summaries: list[dict] = []
+        for item in items:
+            if not isinstance(item, dict):
+                fail(f"Render batch {batch_id} has an invalid item")
+            candidate_id = item.get("candidateId")
+            item_status = item.get("status")
+            revision = item.get("revision")
+            if candidate_id not in candidate_ids:
+                fail(f"Render batch {batch_id} references unknown candidate: {candidate_id}")
+            if candidate_id in seen_batch_candidates:
+                fail(f"Render batch {batch_id} repeats candidate: {candidate_id}")
+            if item_status not in VALID_BATCH_ITEM_STATUSES:
+                fail(f"Render batch {batch_id} has invalid item status: {item_status}")
+            if not isinstance(revision, int) or revision < 1:
+                fail(f"Render batch {batch_id} item {candidate_id} needs a positive revision")
+            seen_batch_candidates.add(candidate_id)
+            item_summaries.append({"candidateId": candidate_id, "revision": revision, "status": item_status})
+        batch_summaries.append({"id": batch_id, "status": batch_status, "items": item_summaries})
+
     return {
         "ok": True,
         "manifest": str(manifest_path),
@@ -302,6 +341,7 @@ def validate(manifest_path: Path, root: Path) -> dict:
         "sourceBytes": source_sizes,
         "selectedCandidateId": selected,
         "candidates": summaries,
+        "renderBatches": batch_summaries,
     }
 
 

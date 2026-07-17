@@ -62,6 +62,7 @@ The source may live elsewhere under the same root. Do not place large media in t
   ],
   "reviewerNotes": [],
   "events": [],
+  "renderBatches": [],
   "updatedAt": "2026-01-01T00:00:00.000Z"
 }
 ```
@@ -72,11 +73,37 @@ Candidate status is one of:
 - `selected`
 - `previewing`
 - `preview-ready`
+- `queued`
 - `rendering`
 - `rendered`
 - `failed`
 
 Omit `selectedCandidateId` until the human selects a candidate.
+
+`renderBatches` is optional for a fresh session and should normally start as
+`[]`. The bridge appends entries after an explicit **Approve batch** action:
+
+```json
+{
+  "id": "00000000-0000-4000-8000-000000000000",
+  "status": "completed",
+  "requestedAt": "2026-01-01T00:00:00.000Z",
+  "completedAt": "2026-01-01T00:02:00.000Z",
+  "items": [
+    {
+      "candidateId": "hook-first",
+      "revision": 1,
+      "status": "rendered",
+      "outputPath": "opencut-projects/interview-highlights/candidates/hook-first/renders/output.mp4"
+    }
+  ]
+}
+```
+
+Batch status is one of `queued`, `rendering`, `completed`, `partial`, or
+`failed`. Batch item status is one of `queued`, `rendering`, `rendered`, or
+`failed`. Agents should not pre-populate batch entries; they are reviewer action
+records.
 
 ## Candidate edit plan
 
