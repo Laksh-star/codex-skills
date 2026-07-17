@@ -141,11 +141,13 @@ Version 2 retains `timeline.clips` as the primary A-roll and adds:
   "assets": [
     { "id": "source", "path": "source-video.mp4", "kind": "video" },
     { "id": "b-roll", "path": "b-roll.mp4", "kind": "video" },
-    { "id": "music", "path": "music.wav", "kind": "audio" }
+    { "id": "music", "path": "music.wav", "kind": "audio" },
+    { "id": "captions", "path": "captions/layered.srt", "kind": "captions" }
   ],
   "timeline": {
     "clips": [
-      { "id": "a-roll", "assetId": "source", "sourceStart": 120.5, "sourceEnd": 165 }
+      { "id": "a-roll-1", "assetId": "source", "sourceStart": 120.5, "sourceEnd": 142 },
+      { "id": "a-roll-2", "assetId": "source", "sourceStart": 142, "sourceEnd": 165 }
     ],
     "overlayTracks": [
       {
@@ -172,6 +174,7 @@ Version 2 retains `timeline.clips` as the primary A-roll and adds:
     "audioTracks": [
       {
         "id": "music-track",
+        "role": "music",
         "clips": [
           {
             "id": "music-bed",
@@ -183,7 +186,48 @@ Version 2 retains `timeline.clips` as the primary A-roll and adds:
           }
         ]
       }
-    ]
+    ],
+    "transitions": [
+      {
+        "id": "answer-fade",
+        "fromClipId": "a-roll-1",
+        "toClipId": "a-roll-2",
+        "type": "fade",
+        "duration": 0.4
+      }
+    ],
+    "titleCards": [
+      {
+        "id": "intro",
+        "template": "intro",
+        "timelineStart": 0,
+        "duration": 1.5,
+        "title": "The central idea",
+        "subtitle": "Interview highlight"
+      },
+      {
+        "id": "speaker",
+        "template": "lower-third",
+        "timelineStart": 2,
+        "duration": 2.5,
+        "title": "Speaker name"
+      }
+    ],
+    "captionsAssetId": "captions",
+    "captionStyle": {
+      "mode": "both",
+      "preset": "bold",
+      "marginV": 48
+    },
+    "audioMix": {
+      "ducking": {
+        "enabled": true,
+        "threshold": 0.04,
+        "ratio": 8,
+        "attackMs": 20,
+        "releaseMs": 250
+      }
+    }
   },
   "output": {
     "path": "opencut-projects/interview-highlights/candidates/layered/renders/output.mp4",
@@ -195,8 +239,16 @@ Version 2 retains `timeline.clips` as the primary A-roll and adds:
 Overlay tracks are composed in ascending `zIndex`. Clips on one overlay track
 must not overlap, but clips on different tracks may. Every overlay must fit
 inside the project canvas. Audio-track assets may be `audio` or `video`; their
-audio is delayed to `timelineStart` and mixed with the primary track. Smart
-ducking is not part of v2 yet, so choose conservative secondary volume.
+audio is delayed to `timelineStart` and mixed with the primary track. Mark
+music beds with `role: "music"`; an enabled ducking block targets all music-role
+tracks unless `targetTrackIds` is explicit. The primary dialogue drives a
+sidechain compressor, so effects and voiceover remain unchanged by default.
+
+Transitions must connect adjacent primary clips and be shorter than both
+clips. Supported types are `fade`, `wipeleft`, `wiperight`, `slideleft`, and
+`slideright`. Title templates are `intro`, `outro`, and `lower-third`. Styled
+burn-in requires SRT captions; mode `both` also preserves a selectable
+`mov_text` stream. Available presets are `clean`, `bold`, and `minimal`.
 
 ## Isolation rule
 
@@ -224,7 +276,7 @@ and that preview file exists.
 
 1. Register `review-session.json` with the local bridge.
 2. Open the opaque `?session=<id>` URL.
-3. Compare candidates, preview source ranges, and inspect v2 overlay/audio track counts.
+3. Compare candidates, preview source ranges, and inspect the v2 overlay/audio, transition, title-card, ducking, and caption summary.
 4. Select a candidate; this only updates manifest state.
 5. Adjust ranges, ordering, speed, volume, or caption inclusion and save a numbered revision.
 6. Render and inspect the fast preview for that exact revision.

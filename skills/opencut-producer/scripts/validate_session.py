@@ -174,14 +174,20 @@ def validate(manifest_path: Path, root: Path) -> dict:
             primary_duration += duration
 
         duration = primary_duration
+        layer_duration = 0.0
         overlay_count = 0
         audio_count = 0
+        transition_count = 0
+        title_count = 0
+        burned_captions = False
+        ducking_enabled = False
         if plan_version == "2":
             overlay_tracks = timeline.get("overlayTracks", [])
             audio_tracks = timeline.get("audioTracks", [])
             if not isinstance(overlay_tracks, list) or not isinstance(audio_tracks, list):
                 fail(f"Candidate {candidate_id} v2 tracks must be arrays")
             track_ids: set[str] = set()
+            music_track_ids: set[str] = set()
             for track_kind, tracks in (("overlay", overlay_tracks), ("audio", audio_tracks)):
                 for track in tracks:
                     track_id = track.get("id") if isinstance(track, dict) else None
@@ -191,6 +197,12 @@ def validate(manifest_path: Path, root: Path) -> dict:
                     if not isinstance(track_clips, list) or not track_clips:
                         fail(f"Candidate {candidate_id} track {track_id} needs clips")
                     track_ids.add(track_id)
+                    if track_kind == "audio":
+                        role = track.get("role", "effects")
+                        if role not in {"music", "effects", "voiceover"}:
+                            fail(f"Candidate {candidate_id} audio track {track_id} has invalid role")
+                        if role == "music":
+                            music_track_ids.add(track_id)
                     for clip in track_clips:
                         clip_duration = validate_timed_clip(candidate_id, clip, asset_ids, clip_ids)
                         timeline_start = clip.get("timelineStart")
@@ -201,9 +213,65 @@ def validate(manifest_path: Path, root: Path) -> dict:
                             fail(f"Candidate {candidate_id} overlay clip {clip['id']} must use video")
                         if track_kind == "audio" and asset_kind not in {"audio", "video"}:
                             fail(f"Candidate {candidate_id} audio clip {clip['id']} must use audio or video")
-                        duration = max(duration, timeline_start + clip_duration)
+                        layer_duration = max(layer_duration, timeline_start + clip_duration)
                         overlay_count += track_kind == "overlay"
                         audio_count += track_kind == "audio"
+
+            transitions = timeline.get("transitions", [])
+            if not isinstance(transitions, list):
+                fail(f"Candidate {candidate_id} transitions must be an array")
+            clip_indexes = {clip["id"]: index for index, clip in enumerate(clips)}
+            transition_boundaries: set[tuple[str, str]] = set()
+            transition_total = 0.0
+            for transition in transitions:
+                if not isinstance(transition, dict):
+                    fail(f"Candidate {candidate_id} has an invalid transition")
+                from_id = transition.get("fromClipId")
+                to_id = transition.get("toClipId")
+                transition_duration = transition.get("duration", 0.5)
+                if from_id not in clip_indexes or clip_indexes.get(to_id) != clip_indexes[from_id] + 1:
+                    fail(f"Candidate {candidate_id} transition must connect adjacent primary clips")
+                boundary = (from_id, to_id)
+                if boundary in transition_boundaries:
+                    fail(f"Candidate {candidate_id} has duplicate transition boundary {from_id}->{to_id}")
+                if not isinstance(transition_duration, (int, float)) or transition_duration < 0.1:
+                    fail(f"Candidate {candidate_id} transition has invalid duration")
+                transition_boundaries.add(boundary)
+                transition_total += transition_duration
+                transition_count += 1
+
+            duration = max(primary_duration - transition_total, layer_duration)
+
+            title_cards = timeline.get("titleCards", [])
+            if not isinstance(title_cards, list):
+                fail(f"Candidate {candidate_id} titleCards must be an array")
+            for card in title_cards:
+                if not isinstance(card, dict) or not isinstance(card.get("title"), str):
+                    fail(f"Candidate {candidate_id} has an invalid title card")
+                start = card.get("timelineStart")
+                card_duration = card.get("duration")
+                if not isinstance(start, (int, float)) or not isinstance(card_duration, (int, float)) or start < 0 or card_duration < 0.5:
+                    fail(f"Candidate {candidate_id} title card has invalid timing")
+                duration = max(duration, start + card_duration)
+                title_count += 1
+
+            caption_style = timeline.get("captionStyle")
+            if caption_style is not None:
+                if not isinstance(caption_style, dict) or not timeline.get("captionsAssetId"):
+                    fail(f"Candidate {candidate_id} captionStyle requires captionsAssetId")
+                mode = caption_style.get("mode", "burn-in")
+                if mode not in {"selectable", "burn-in", "both"}:
+                    fail(f"Candidate {candidate_id} has invalid caption mode")
+                burned_captions = mode in {"burn-in", "both"}
+
+            ducking = timeline.get("audioMix", {}).get("ducking") if isinstance(timeline.get("audioMix", {}), dict) else None
+            if isinstance(ducking, dict) and ducking.get("enabled", True):
+                targets = ducking.get("targetTrackIds", [])
+                if not isinstance(targets, list) or any(target not in track_ids for target in targets):
+                    fail(f"Candidate {candidate_id} ducking references an unknown track")
+                if not targets and not music_track_ids:
+                    fail(f"Candidate {candidate_id} ducking needs a music-role or explicit target track")
+                ducking_enabled = True
 
         candidate_ids.add(candidate_id)
         summaries.append(
@@ -214,6 +282,10 @@ def validate(manifest_path: Path, root: Path) -> dict:
                 "primaryClips": len(clips),
                 "overlayClips": overlay_count,
                 "audioClips": audio_count,
+                "transitions": transition_count,
+                "titleCards": title_count,
+                "burnedCaptions": burned_captions,
+                "smartDucking": ducking_enabled,
                 "durationSeconds": round(duration, 3),
                 "outputPath": output_path,
             }

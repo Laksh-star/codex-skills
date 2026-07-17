@@ -36,7 +36,7 @@ Skills for building, operating, or packaging agent-facing software workflows.
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
 | [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
 | [`fork-product-development`](skills/fork-product-development/SKILL.md) | Maintain private product forks while preparing clean upstream PRs. | Validated locally |
-| [`opencut-producer`](skills/opencut-producer/SKILL.md) | Turn local videos into isolated edit candidates, an OpenCut review session, and a human-approved render. | Validated locally |
+| [`opencut-producer`](skills/opencut-producer/SKILL.md) | Turn local videos into polished candidates with ducking, transitions, titles, styled captions, review, and approval. | Validated locally |
 
 ### Plugin & Deployment Packaging
 
@@ -116,7 +116,8 @@ Then start a new Codex session and ask for the skill by name, or ask for a task 
 ```text
 Use $opencut-producer to create three review candidates from
 /absolute/path/to/video.mp4, layer the supplied B-roll and music where they
-support the story, and open the OpenCut approval workspace.
+support the story, apply suitable transitions, title cards, styled captions,
+and smart music ducking, then open the OpenCut approval workspace.
 ```
 
 Codex prepares differentiated candidates and starts the local review session. In
@@ -124,8 +125,8 @@ OpenCut, adjust clip ranges, ordering, speed, volume, or caption inclusion; save
 the edit as a numbered revision; render and inspect its fast preview; then use
 the separate **Approve final** action for the high-quality local MP4. Selection,
 preview rendering, and final approval are deliberately separate decisions. The
-skill uses schema v2 for supplied overlay/audio assets and keeps sequential-only
-requests on the compatible v1 contract.
+skill uses schema v2 for production styling and layered assets, while keeping
+strictly sequential, selectable-caption requests on the compatible v1 contract.
 
 ### Wiki Maintainer Setup
 

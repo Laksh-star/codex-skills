@@ -1,4 +1,4 @@
 interface:
   display_name: "OpenCut Producer"
-  short_description: "Build reviewed layered video candidates."
-  default_prompt: "Use $opencut-producer to create three layered review candidates from these local video and audio assets and open the OpenCut approval workspace."
+  short_description: "Build polished, reviewed video candidates."
+  default_prompt: "Use $opencut-producer to create three polished review candidates from these local video and audio assets, applying suitable transitions, title cards, styled captions, and smart music ducking, then open the OpenCut approval workspace."

@@ -52,7 +52,9 @@ Do not expose invented numeric confidence as objective truth. Use the score only
 - Convert source timestamps to output-timeline timestamps after trims and speed changes.
 - Keep cues readable, normally one or two lines.
 - Correct obvious transcription artifacts without rewriting the speaker's meaning.
-- Use SRT or VTT; the current renderer muxes captions into MP4 as a selectable subtitle track.
+- Use SRT for styled burn-in captions. Choose `both` when the user benefits from a burned-in treatment plus an accessible selectable MP4 subtitle track.
+- Keep a bounded render at 200 cues or fewer; split longer programs into reviewable candidates rather than overloading one filter graph.
+- Default to `clean`; use `bold` for short social clips and `minimal` when imagery must stay unobstructed.
 - Verify the final caption cue does not extend beyond the rendered duration.
 
 ## Layered plans
@@ -62,7 +64,9 @@ Do not expose invented numeric confidence as objective truth. Use the score only
 - Use overlay tracks for B-roll, picture-in-picture, demonstrations, or cutaway repair.
 - Keep overlay placement inside the output canvas and verify legibility at the target aspect ratio.
 - Use independent audio tracks for supplied music, ambience, or secondary narration.
-- Start secondary audio at low volume because automatic ducking is not implemented yet.
+- Mark music beds with `role: "music"`, start them conservatively, and enable speech-keyed ducking. Keep effects and voiceover out of the ducking target unless explicitly intended.
+- Use transitions to smooth a genuine editorial join, not every cut. Prefer a 0.3–0.6 second fade unless motion direction makes a wipe or slide meaningful.
+- Use title cards sparingly: intro for orientation, lower-third for identity, and outro for a deliberate close or call to action.
 - Compile and preview every layered plan; JSON inspection alone cannot verify visual occlusion or audio balance.
 
 ## Large local videos
