@@ -36,6 +36,7 @@ Skills for building, operating, or packaging agent-facing software workflows.
 | [`content-os-manager`](skills/content-os-manager/SKILL.md) | Set up a markdown Content OS with Codex thread prompts for ideas, drafts, feedback, published posts, and themes. | Validated locally |
 | [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
 | [`fork-product-development`](skills/fork-product-development/SKILL.md) | Maintain private product forks while preparing clean upstream PRs. | Validated locally |
+| [`opencut-producer`](skills/opencut-producer/SKILL.md) | Turn local videos into isolated edit candidates, an OpenCut review session, and a human-approved render. | Validated locally |
 
 ### Plugin & Deployment Packaging
 
@@ -105,6 +106,7 @@ cp -R skills/competitive-intelligence-agent "${CODEX_HOME:-$HOME/.codex}/skills/
 cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/expert-judgment-distillation "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/fork-product-development "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/opencut-producer "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -166,6 +168,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/fork-product-development
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/opencut-producer
 ```
 
 Each published skill is validated locally before being added here.
