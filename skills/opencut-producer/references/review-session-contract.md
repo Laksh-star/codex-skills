@@ -42,6 +42,7 @@ The source may live elsewhere under the same root. Do not place large media in t
       "title": "Hook-first",
       "summary": "Fast opening and immediate payoff",
       "planPath": "opencut-projects/interview-highlights/candidates/hook-first/edit-plan.json",
+      "revision": 1,
       "status": "ready-for-review"
     },
     {
@@ -59,6 +60,8 @@ The source may live elsewhere under the same root. Do not place large media in t
       "status": "ready-for-review"
     }
   ],
+  "reviewerNotes": [],
+  "events": [],
   "updatedAt": "2026-01-01T00:00:00.000Z"
 }
 ```
@@ -67,6 +70,8 @@ Candidate status is one of:
 
 - `ready-for-review`
 - `selected`
+- `previewing`
+- `preview-ready`
 - `rendering`
 - `rendered`
 - `failed`
@@ -134,13 +139,21 @@ opencut-projects/<project>/candidates/<candidate>/
 
 The normal output is `renders/output.mp4`. Shared output directories are invalid.
 
+Each candidate also owns immutable `revisions/revision-N.edit-plan.json`
+snapshots and revision-specific `renders/preview-rN.mp4` previews. Saving an edit
+increments `revision` and clears its previous preview relationship. Final
+approval is valid only when `lastPreviewRevision` equals the current `revision`
+and that preview file exists.
+
 ## Review lifecycle
 
 1. Register `review-session.json` with the local bridge.
 2. Open the opaque `?session=<id>` URL.
 3. Compare candidates and preview source ranges.
 4. Select a candidate; this only updates manifest state.
-5. Approve from the UI; this writes the approved plan and project record, then renders.
-6. Restore the same selected/rendered state after refresh.
+5. Adjust ranges, ordering, speed, volume, or caption inclusion and save a numbered revision.
+6. Render and inspect the fast preview for that exact revision.
+7. Approve the final render separately; this writes the approved plan, hashes, project record, and high-quality output.
+8. Restore the same selection, revision, notes, preview, audit, and rendered state after refresh.
 
 Session IDs and approval tokens are process-local. The manifest and candidate outputs are durable.

@@ -5,7 +5,7 @@ description: Turn a local video and plain-English editorial brief into multiple 
 
 # OpenCut Producer
 
-Create candidate edits automatically, but keep selection, rendering, and publishing under explicit human control.
+Create candidate edits automatically, but keep selection, preview rendering, final rendering, and publishing under explicit human control.
 
 Read these references as needed:
 
@@ -91,7 +91,7 @@ Each plan must render inside its own candidate directory:
 candidates/<candidate-id>/renders/output.mp4
 ```
 
-Set every new candidate to `ready-for-review`. Do not preselect a candidate unless the user already made an explicit choice.
+Set every new candidate to `ready-for-review`, revision `1`, with empty reviewer-note and event arrays. Record the creating agent/model when known, but never store credentials or full prompts. Do not preselect a candidate unless the user already made an explicit choice.
 
 ## 5. Validate before launch
 
@@ -129,8 +129,11 @@ Keep the launcher alive while the user reviews candidates. If the bridge restart
 ## 7. Preserve the human gate
 
 - Candidate selection is not render approval.
-- Never call the approval endpoint or reuse the approval token on the user's behalf.
-- Rendering must begin from the visible **Approve & render** action in the OpenCut UI.
+- Review edits must be saved as a new numbered revision; never silently mutate an approved plan.
+- A fast preview applies only to the exact revision that produced it. Any later edit invalidates it.
+- Never call the preview or final-approval endpoints or reuse the action token on the user's behalf.
+- Preview rendering must begin from the visible **Render preview** action.
+- Final rendering must begin from the separate visible **Approve final** action, after the reviewer inspects the current preview.
 - Never upload or publish a rendered clip as part of this skill.
 - Treat publishing as a separate workflow with destination-specific approval.
 
@@ -138,11 +141,12 @@ Keep the launcher alive while the user reviews candidates. If the bridge restart
 
 After the UI reports completion:
 
-1. Confirm the selected candidate status is `rendered`.
+1. Confirm the selected candidate status is `rendered`, and that the audit history contains preview and final-render events for the approved revision.
 2. Inspect `opencut.project.json` and `approved-edit-plan.json` inside that candidate directory.
-3. Run FFprobe on the MP4 and report duration, resolution, codecs, subtitle stream, and size.
-4. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
-5. Report exact output paths and any transcription or rendering limitations.
+3. Confirm the project record contains the candidate revision, plan hash, source hashes, creating agent/model when supplied, and the latest reviewer note.
+4. Run FFprobe on the MP4 and report duration, resolution, codecs, subtitle stream, and size.
+5. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
+6. Report exact output paths and any transcription or rendering limitations.
 
 ## Failure handling
 
