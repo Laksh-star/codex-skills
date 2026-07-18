@@ -21,6 +21,7 @@ VALID_STATUSES = {
 }
 VALID_BATCH_STATUSES = {"queued", "rendering", "completed", "partial", "failed"}
 VALID_BATCH_ITEM_STATUSES = {"queued", "rendering", "rendered", "failed"}
+VALID_EXPORT_PACKAGE_STATUSES = {"created", "partial"}
 
 
 def fail(message: str) -> None:
@@ -334,6 +335,67 @@ def validate(manifest_path: Path, root: Path) -> dict:
             item_summaries.append({"candidateId": candidate_id, "revision": revision, "status": item_status})
         batch_summaries.append({"id": batch_id, "status": batch_status, "items": item_summaries})
 
+    export_packages = manifest.get("exportPackages", [])
+    if not isinstance(export_packages, list):
+        fail("exportPackages must be an array when present")
+    export_summaries: list[dict] = []
+    for package in export_packages:
+        if not isinstance(package, dict):
+            fail("Every export package must be an object")
+        package_id = package.get("id")
+        package_status = package.get("status")
+        package_path = package.get("packagePath")
+        manifest_path_text = package.get("manifestPath")
+        summary_path = package.get("summaryPath")
+        package_candidates = package.get("candidates")
+        if not isinstance(package_id, str) or not package_id:
+            fail("Every export package needs an id")
+        if package_status not in VALID_EXPORT_PACKAGE_STATUSES:
+            fail(f"Invalid export package status: {package_status}")
+        if not isinstance(package_path, str) or not package_path:
+            fail(f"Export package {package_id} needs packagePath")
+        if not isinstance(manifest_path_text, str) or not manifest_path_text:
+            fail(f"Export package {package_id} needs manifestPath")
+        if not isinstance(summary_path, str) or not summary_path:
+            fail(f"Export package {package_id} needs summaryPath")
+        if not isinstance(package_candidates, list) or not package_candidates:
+            fail(f"Export package {package_id} needs candidates")
+        resolve_inside(root, package_path, must_exist=False)
+        resolve_inside(root, manifest_path_text)
+        resolve_inside(root, summary_path)
+        seen_export_candidates: set[str] = set()
+        candidate_summaries: list[dict] = []
+        for item in package_candidates:
+            if not isinstance(item, dict):
+                fail(f"Export package {package_id} has an invalid candidate entry")
+            candidate_id = item.get("candidateId")
+            revision = item.get("revision")
+            packaged_output_path = item.get("packagedOutputPath")
+            output_bytes = item.get("outputBytes")
+            duration = item.get("durationSeconds")
+            if candidate_id not in candidate_ids:
+                fail(f"Export package {package_id} references unknown candidate: {candidate_id}")
+            if candidate_id in seen_export_candidates:
+                fail(f"Export package {package_id} repeats candidate: {candidate_id}")
+            if not isinstance(revision, int) or revision < 1:
+                fail(f"Export package {package_id} candidate {candidate_id} needs a positive revision")
+            if not isinstance(packaged_output_path, str) or not packaged_output_path:
+                fail(f"Export package {package_id} candidate {candidate_id} needs packagedOutputPath")
+            if not isinstance(output_bytes, int) or output_bytes < 0:
+                fail(f"Export package {package_id} candidate {candidate_id} needs non-negative outputBytes")
+            if not isinstance(duration, (int, float)) or duration < 0:
+                fail(f"Export package {package_id} candidate {candidate_id} needs non-negative durationSeconds")
+            resolve_inside(root, packaged_output_path)
+            for optional_path_key in ("approvedEditPlanPath", "projectRecordPath", "captionsPath", "contactSheetPath"):
+                optional_path = item.get(optional_path_key)
+                if optional_path is not None:
+                    if not isinstance(optional_path, str) or not optional_path:
+                        fail(f"Export package {package_id} candidate {candidate_id} has invalid {optional_path_key}")
+                    resolve_inside(root, optional_path)
+            seen_export_candidates.add(candidate_id)
+            candidate_summaries.append({"candidateId": candidate_id, "revision": revision, "packagedOutputPath": packaged_output_path})
+        export_summaries.append({"id": package_id, "status": package_status, "candidates": candidate_summaries})
+
     return {
         "ok": True,
         "manifest": str(manifest_path),
@@ -342,6 +404,7 @@ def validate(manifest_path: Path, root: Path) -> dict:
         "selectedCandidateId": selected,
         "candidates": summaries,
         "renderBatches": batch_summaries,
+        "exportPackages": export_summaries,
     }
 
 

@@ -63,6 +63,7 @@ The source may live elsewhere under the same root. Do not place large media in t
   "reviewerNotes": [],
   "events": [],
   "renderBatches": [],
+  "exportPackages": [],
   "updatedAt": "2026-01-01T00:00:00.000Z"
 }
 ```
@@ -104,6 +105,44 @@ Batch status is one of `queued`, `rendering`, `completed`, `partial`, or
 `failed`. Batch item status is one of `queued`, `rendering`, `rendered`, or
 `failed`. Agents should not pre-populate batch entries; they are reviewer action
 records.
+
+`exportPackages` is optional for a fresh session and should normally start as
+`[]`. The bridge appends entries after a local export package is created for
+rendered candidates:
+
+```json
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "version": "1",
+  "reviewSessionId": "interview-highlights",
+  "title": "Choose an interview highlight",
+  "status": "created",
+  "createdAt": "2026-01-01T00:03:00.000Z",
+  "packagePath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000",
+  "manifestPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/manifest.json",
+  "summaryPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/summary.md",
+  "candidates": [
+    {
+      "candidateId": "hook-first",
+      "revision": 1,
+      "title": "Hook-first",
+      "durationSeconds": 44.5,
+      "outputPath": "opencut-projects/interview-highlights/candidates/hook-first/renders/output.mp4",
+      "packagedOutputPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/media/hook-first-output.mp4",
+      "outputBytes": 1234567,
+      "approvedEditPlanPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/records/hook-first-approved-edit-plan.json",
+      "projectRecordPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/records/hook-first-opencut.project.json",
+      "captionsPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/captions/hook-first-hook-first.srt",
+      "contactSheetPath": "opencut-projects/interview-highlights/exports/2026-01-01T00-03-00-000Z-00000000/contact-sheets/hook-first.jpg"
+    }
+  ],
+  "warnings": []
+}
+```
+
+Export package status is `created` or `partial`. A `partial` package means the
+rendered MP4 was copied but optional metadata or contact-sheet generation
+reported warnings. Export packages must not include the original source video.
 
 ## Candidate edit plan
 

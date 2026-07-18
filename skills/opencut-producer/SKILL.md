@@ -1,11 +1,11 @@
 ---
 name: opencut-producer
-description: Turn local video, audio, optional B-roll, and a plain-English editorial brief into multiple isolated OpenCut edit candidates with smart music ducking, transitions, title cards, styled captions, editable production controls, an opaque review session, and human-approved single or batch local renders. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; produce polished short clips; arrange several generated clips; add B-roll, music, subtitles, intros, outros, or lower thirds; create aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; batch-render approved candidates; or continue a previously created OpenCut review session.
+description: Turn local video, audio, optional B-roll, and a plain-English editorial brief into multiple isolated OpenCut edit candidates with smart music ducking, transitions, title cards, styled captions, editable production controls, production presets, preflight checks, opaque review sessions, human-approved single or batch local renders, and local export packages. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; produce polished short clips; arrange several generated clips; add B-roll, music, subtitles, intros, outros, or lower thirds; create aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; batch-render approved candidates; package rendered outputs for handoff; or continue a previously created OpenCut review session.
 ---
 
 # OpenCut Producer
 
-Create candidate edits automatically, but keep selection, preview rendering, single final rendering, batch final rendering, and publishing under explicit human control.
+Create candidate edits automatically, but keep selection, preview rendering, single final rendering, batch final rendering, export packaging, and publishing under explicit human control.
 
 Read these references as needed:
 
@@ -23,6 +23,7 @@ Collect or infer:
 - target aspect ratio, default source ratio;
 - caption preference, default enabled;
 - production finish, default `polished` with clean transitions, styled captions, and speech-aware music ducking when a music asset exists;
+- production preset, default `clean-interview` for interviews/talks, `bold-social` for short social clips, and `minimal-archive` for archival/reference clips;
 - optional B-roll/video overlays and independent audio assets;
 - OpenCut checkout path, if it cannot be discovered locally.
 
@@ -129,6 +130,7 @@ When OpenCut MCP tools are available:
 4. Use `opencut_upgrade_edit_plan` when an existing v1 candidate needs v2 layers.
 5. Compile every v2 plan and inspect the returned `overlay`, `amix`, `sidechaincompress`, `xfade`, and `acrossfade` graph before saving it.
 6. Save plans only inside the chosen root.
+7. When available, use `opencut_preflight_review_session` as a read-only check for saved review sessions before preview, final, batch, or export actions. Treat `block` results as blocking and report `warn` results plainly.
 
 Always run the bundled session validator, resolving its path relative to this `SKILL.md`:
 
@@ -155,10 +157,11 @@ Return or open the printed `?session=<opaque-id>` URL. The browser should stream
 Keep the launcher alive while the user reviews candidates. If the bridge restarts, register the manifest again and use the new opaque URL; selection and rendered state remain in the manifest.
 
 For v2 plans, make the candidate summary name the B-roll, music, transition,
-title, and caption treatment. The current UI edits the primary A-roll plus
-existing overlay, audio, transition, title-card, caption-style, and ducking
-fields. The compiled preview remains the review artifact for the exact saved
-revision.
+title, caption treatment, and production preset. The current UI edits the
+primary A-roll plus existing overlay, audio, transition, title-card,
+caption-style, and ducking fields, and can apply coordinated production presets
+to those fields. The compiled preview remains the review artifact for the exact
+saved revision.
 
 ## 7. Preserve the human gate
 
@@ -170,6 +173,7 @@ revision.
 - Preview rendering must begin from the visible **Render preview** action.
 - Final rendering must begin from the separate visible **Approve final** action, after the reviewer inspects the current preview.
 - Batch rendering must begin from the separate visible **Approve batch** action, and only for candidates whose current revision already has a preview.
+- Export packaging must happen only after candidates are rendered and only when the user asked for a handoff/package or the workflow requires final delivery artifacts.
 - Never upload or publish a rendered clip as part of this skill.
 - Treat publishing as a separate workflow with destination-specific approval.
 
@@ -183,8 +187,9 @@ After the UI reports completion:
 4. Confirm each project record contains the candidate revision, plan hash, source hashes, creating agent/model when supplied, and the latest reviewer note.
 5. Run FFprobe on each MP4 and report duration, resolution, codecs, subtitle stream, and size.
 6. For v2, verify overlay timing/placement, mixed audio inputs, ducking, transitions, title cards, and caption styling in the compiled graph and rendered preview.
-7. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
-8. Report exact output paths and any transcription or rendering limitations.
+7. If a local handoff is requested, create or confirm an export package with rendered MP4 copies, approved plans, project records, captions, contact sheets when available, `manifest.json`, and `summary.md`; never copy the original source video into the package.
+8. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
+9. Report exact output paths, export package paths, and any transcription, preflight, packaging, or rendering limitations.
 
 ## Failure handling
 

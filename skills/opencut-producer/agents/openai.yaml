@@ -1,4 +1,4 @@
 interface:
   display_name: "OpenCut Producer"
-  short_description: "Build reviewed video candidates."
-  default_prompt: "Use $opencut-producer to create three polished review candidates from these local video and audio assets, tune production controls, then open the OpenCut approval workspace for preview, single-final, or batch render approval."
+  short_description: "Build, review, render, and package video candidates."
+  default_prompt: "Use $opencut-producer to create three polished review candidates from these local video and audio assets, apply a suitable production preset, run preflight checks, then open the OpenCut approval workspace for preview, single-final, batch render, and local export-package handoff."
