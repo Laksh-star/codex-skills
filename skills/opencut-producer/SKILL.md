@@ -1,6 +1,6 @@
 ---
 name: opencut-producer
-description: Turn local video, audio, optional B-roll, and a plain-English editorial brief into multiple isolated OpenCut edit candidates with smart music ducking, transitions, title cards, provider-backed styled captions, editable production controls, production presets, preflight checks, opaque review sessions, human-approved single or batch local renders, and local export packages. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; produce polished short clips; arrange several generated clips; add B-roll, music, subtitles, intros, outros, or lower thirds; create aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; batch-render approved candidates; package rendered outputs for handoff; or continue a previously created OpenCut review session.
+description: Turn local video, audio, optional B-roll, and a plain-English editorial brief into multiple isolated OpenCut edit candidates with smart music ducking, transitions, title cards, provider-backed styled captions, provider-readiness checks, caption QA revision saves, editable production controls, production presets, preflight checks, opaque review sessions, human-approved single or batch local renders, and local export packages. Use when Codex is asked to find highlights in interviews, talks, podcasts, webinars, meetings, or other local video files; produce polished short clips; arrange several generated clips; add B-roll, music, subtitles, intros, outros, or lower thirds; create aspect-ratio variants; handle very large source videos; launch the OpenCut candidate review UI; batch-render approved candidates; package rendered outputs for handoff; or continue a previously created OpenCut review session.
 ---
 
 # OpenCut Producer
@@ -71,13 +71,25 @@ If transcription sends audio to an external service:
 
 Skip transcription only when reliable timed text already exists or the requested edit can be made from supplied timestamps.
 
-When the OpenCut bridge reports `subtitleProviderExecution` or exposes
+When the OpenCut bridge reports `providerReadinessChecks` or exposes
+`opencut_check_review_system`, run that read-only setup check before provider
+caption work. It should report FFmpeg, ffprobe, and the selected provider's
+local command/API-key/provided-caption availability without transcribing,
+rendering, uploading, or exposing secret values.
+
+When the bridge reports `subtitleProviderExecution` or exposes
 `opencut_generate_review_captions`, prefer that path for saved review-session
 candidates. It extracts candidate-bounded WAV audio, runs local Whisper/OpenAI
 API/OpenRouter/provided-caption handling, writes the SRT under the candidate
 directory, attaches it to the plan, and creates a new numbered revision. Never
 set `externalUploadApproved` unless the user explicitly approved the named
 external provider for this source.
+
+When the bridge reports `captionQaEditor` or exposes
+`opencut_revise_review_captions`, use it for reviewer-approved caption
+text/timing corrections instead of overwriting the original caption asset.
+Saving QA edits must create a new local SRT inside the candidate directory,
+increment the candidate revision, and require a fresh preview.
 
 ## 3. Generate differentiated candidates
 
@@ -164,8 +176,10 @@ When OpenCut MCP tools are available:
 4. Use `opencut_upgrade_edit_plan` when an existing v1 candidate needs v2 layers.
 5. Compile every v2 plan and inspect the returned `overlay`, `amix`, `sidechaincompress`, `xfade`, and `acrossfade` graph before saving it.
 6. Save plans only inside the chosen root.
-7. When captions are enabled and the provider is approved, use `opencut_generate_review_captions` for saved review candidates before preview. For OpenAI/OpenRouter, pass `externalUploadApproved: true` only after explicit consent.
-8. When available, use `opencut_preflight_review_session` as a read-only check for saved review sessions before preview, final, batch, or export actions. Treat `block` results as blocking and report `warn` results plainly.
+7. When captions are enabled, use `opencut_check_review_system` before generation or QA if available, and report missing provider setup plainly.
+8. When captions are enabled and the provider is approved, use `opencut_generate_review_captions` for saved review candidates before preview. For OpenAI/OpenRouter, pass `externalUploadApproved: true` only after explicit consent.
+9. When the reviewer supplies caption text/timing fixes, use `opencut_revise_review_captions` for saved candidates; never overwrite source captions in place.
+10. When available, use `opencut_preflight_review_session` as a read-only check for saved review sessions before preview, final, batch, or export actions. Treat `block` results as blocking and report `warn` results plainly.
 
 Always run the bundled session validator, resolving its path relative to this `SKILL.md`:
 
@@ -196,9 +210,10 @@ title, caption treatment, and production preset. Make the candidate rationale
 state whether the choice is a distinct moment or a format/style variant. The
 current UI edits the primary A-roll plus existing overlay, audio, transition,
 title-card, caption-style, and ducking fields, can apply coordinated production
-presets, can trigger provider-backed caption generation or provided-caption
-confirmation for the selected saved revision, and includes a WYSIWYG
-preview-monitor surface for existing visual layers. Reviewers can
+presets, can check subtitle-provider readiness, can trigger provider-backed
+caption generation or provided-caption confirmation for the selected saved
+revision, can save caption text/timing QA edits as new revisions, and includes a
+WYSIWYG preview-monitor surface for existing visual layers. Reviewers can
 drag/resize/nudge overlay and title boxes and drag
 burned-in captions between safe top/middle/bottom placement zones. The compiled
 preview remains the approval artifact for the exact saved revision; the
@@ -210,6 +225,7 @@ WYSIWYG surface is an editing aid, not final-render approval.
 - Batch selection is not render approval.
 - Review edits must be saved as a new numbered revision; never silently mutate an approved plan.
 - Provider-backed caption generation writes a new revision and invalidates older previews; do it before asking the user to render a preview.
+- Caption QA edits write a new revision and invalidate older previews; save or reset them before preview/final approval.
 - A fast preview applies only to the exact revision that produced it. Any later edit invalidates it.
 - Never call the preview or final-approval endpoints or reuse the action token on the user's behalf.
 - Preview rendering must begin from the visible **Render preview** action.
@@ -228,7 +244,7 @@ After the UI reports completion:
 3. Inspect `opencut.project.json` and `approved-edit-plan.json` inside every rendered candidate directory.
 4. Confirm each project record contains the candidate revision, plan hash, source hashes, creating agent/model when supplied, and the latest reviewer note.
 5. Run FFprobe on each MP4 and report duration, resolution, codecs, subtitle stream, and size.
-6. For v2, verify overlay timing/placement, mixed audio inputs, ducking, transitions, title cards, and caption styling in the compiled graph and rendered preview.
+6. For v2, verify overlay timing/placement, mixed audio inputs, ducking, transitions, title cards, caption cue edits, and caption styling in the compiled graph and rendered preview.
 7. If a local handoff is requested, create or confirm an export package with rendered MP4 copies, approved plans, project records, captions, contact sheets when available, `manifest.json`, and `summary.md`; never copy the original source video into the package.
 8. Preserve all non-selected candidates for later comparison unless the user asks to remove them.
 9. Report exact output paths, export package paths, and any transcription, preflight, packaging, or rendering limitations.
