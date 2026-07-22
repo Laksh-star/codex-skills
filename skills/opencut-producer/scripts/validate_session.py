@@ -148,6 +148,11 @@ def validate(manifest_path: Path, root: Path) -> dict:
         plan_version = plan.get("version")
         if plan_version not in {"1", "2"}:
             fail(f"Candidate {candidate_id} plan version must be '1' or '2'")
+        project = plan.get("project")
+        project_width = project.get("width") if isinstance(project, dict) else None
+        project_height = project.get("height") if isinstance(project, dict) else None
+        if not isinstance(project_width, (int, float)) or not isinstance(project_height, (int, float)):
+            fail(f"Candidate {candidate_id} project needs width and height")
         output = plan.get("output")
         output_path = output.get("path") if isinstance(output, dict) else None
         if not isinstance(output_path, str) or not output_path.endswith(".mp4"):
@@ -283,6 +288,20 @@ def validate(manifest_path: Path, root: Path) -> dict:
                 card_duration = card.get("duration")
                 if not isinstance(start, (int, float)) or not isinstance(card_duration, (int, float)) or start < 0 or card_duration < 0.5:
                     fail(f"Candidate {candidate_id} title card has invalid timing")
+                layout_x = card.get("x", 0)
+                layout_y = card.get("y", 0)
+                layout_width = card.get("width", project_width)
+                layout_height = card.get("height", project_height)
+                if not all(isinstance(value, (int, float)) for value in (layout_x, layout_y, layout_width, layout_height)):
+                    fail(f"Candidate {candidate_id} title card has invalid layout")
+                if layout_x < 0 or layout_y < 0 or layout_width <= 0 or layout_height <= 0 or layout_x + layout_width > project_width or layout_y + layout_height > project_height:
+                    fail(f"Candidate {candidate_id} title card layout must fit inside the project canvas")
+                opacity = card.get("opacity", 1)
+                font_scale = card.get("fontScale", 1)
+                if not isinstance(opacity, (int, float)) or opacity < 0 or opacity > 1:
+                    fail(f"Candidate {candidate_id} title card has invalid opacity")
+                if not isinstance(font_scale, (int, float)) or font_scale < 0.5 or font_scale > 2:
+                    fail(f"Candidate {candidate_id} title card has invalid fontScale")
                 duration = max(duration, start + card_duration)
                 title_count += 1
 

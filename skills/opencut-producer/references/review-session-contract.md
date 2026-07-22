@@ -289,14 +289,26 @@ Version 2 retains `timeline.clips` as the primary A-roll and adds:
         "timelineStart": 0,
         "duration": 1.5,
         "title": "The central idea",
-        "subtitle": "Interview highlight"
+        "subtitle": "Interview highlight",
+        "x": 154,
+        "y": 252,
+        "width": 973,
+        "height": 202,
+        "opacity": 0.92,
+        "fontScale": 1.1
       },
       {
         "id": "speaker",
         "template": "lower-third",
         "timelineStart": 2,
         "duration": 2.5,
-        "title": "Speaker name"
+        "title": "Speaker name",
+        "x": 77,
+        "y": 490,
+        "width": 998,
+        "height": 158,
+        "opacity": 0.9,
+        "fontScale": 1
       }
     ],
     "captionsAssetId": "captions",
@@ -332,9 +344,11 @@ sidechain compressor, so effects and voiceover remain unchanged by default.
 
 Transitions must connect adjacent primary clips and be shorter than both
 clips. Supported types are `fade`, `wipeleft`, `wiperight`, `slideleft`, and
-`slideright`. Title templates are `intro`, `outro`, and `lower-third`. Styled
-burn-in requires SRT captions; mode `both` also preserves a selectable
-`mov_text` stream. Available presets are `clean`, `bold`, and `minimal`.
+`slideright`. Title templates are `intro`, `outro`, and `lower-third`. Optional
+title layout fields are `x`, `y`, `width`, `height`, `opacity`, and
+`fontScale`; keep the title box inside the project canvas. Styled burn-in
+requires SRT captions; mode `both` also preserves a selectable `mov_text`
+stream. Available presets are `clean`, `bold`, and `minimal`.
 
 ## Isolation rule
 

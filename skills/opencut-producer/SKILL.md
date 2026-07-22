@@ -183,10 +183,12 @@ For v2 plans, make the candidate summary name the B-roll, music, transition,
 title, caption treatment, and production preset. Make the candidate rationale
 state whether the choice is a distinct moment or a format/style variant. The
 current UI edits the primary A-roll plus existing overlay, audio, transition,
-title-card, caption-style, and ducking fields, and can apply coordinated
-production presets to those fields. The compiled preview remains the review
-artifact for the exact saved revision. Titles/logos/overlays currently use
-inspector fields, not a full drag-resize WYSIWYG canvas.
+title-card, caption-style, and ducking fields, can apply coordinated production
+presets, and includes a WYSIWYG preview-monitor surface for existing visual
+layers. Reviewers can drag/resize/nudge overlay and title boxes and drag
+burned-in captions between safe top/middle/bottom placement zones. The compiled
+preview remains the approval artifact for the exact saved revision; the
+WYSIWYG surface is an editing aid, not final-render approval.
 
 ## 7. Preserve the human gate
 
