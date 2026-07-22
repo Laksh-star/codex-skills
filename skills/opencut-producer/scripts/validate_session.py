@@ -30,6 +30,8 @@ VALID_CANDIDATE_STRATEGIES = {
     "manual",
     "unspecified",
 }
+VALID_SUBTITLE_PROVIDER_MODES = {"local-whisper", "openai-api", "openrouter", "provided-captions"}
+VALID_SUBTITLE_PROVIDER_STATUSES = {"selected", "needs-generation", "generated", "provided", "failed"}
 
 
 def fail(message: str) -> None:
@@ -217,6 +219,7 @@ def validate(manifest_path: Path, root: Path) -> dict:
         title_count = 0
         burned_captions = False
         ducking_enabled = False
+        subtitle_provider_mode = None
         if plan_version == "2":
             overlay_tracks = timeline.get("overlayTracks", [])
             audio_tracks = timeline.get("audioTracks", [])
@@ -314,6 +317,27 @@ def validate(manifest_path: Path, root: Path) -> dict:
                     fail(f"Candidate {candidate_id} has invalid caption mode")
                 burned_captions = mode in {"burn-in", "both"}
 
+            subtitle_provider = timeline.get("subtitleProvider")
+            if subtitle_provider is not None:
+                if not isinstance(subtitle_provider, dict):
+                    fail(f"Candidate {candidate_id} has invalid subtitleProvider")
+                provider_mode = subtitle_provider.get("mode", "local-whisper")
+                if provider_mode not in VALID_SUBTITLE_PROVIDER_MODES:
+                    fail(f"Candidate {candidate_id} has invalid subtitle provider mode")
+                provider_status = subtitle_provider.get("status", "selected")
+                if provider_status not in VALID_SUBTITLE_PROVIDER_STATUSES:
+                    fail(f"Candidate {candidate_id} has invalid subtitle provider status")
+                if provider_mode == "provided-captions" and not timeline.get("captionsAssetId"):
+                    fail(f"Candidate {candidate_id} provided-captions provider requires captionsAssetId")
+                estimated_cost = subtitle_provider.get("estimatedCostUsd")
+                if estimated_cost is not None and (not isinstance(estimated_cost, (int, float)) or estimated_cost < 0):
+                    fail(f"Candidate {candidate_id} has invalid subtitle provider cost")
+                for text_key, maximum_length in (("model", 160), ("language", 20), ("notes", 500)):
+                    text_value = subtitle_provider.get(text_key)
+                    if text_value is not None and (not isinstance(text_value, str) or not text_value.strip() or len(text_value) > maximum_length):
+                        fail(f"Candidate {candidate_id} has invalid subtitle provider {text_key}")
+                subtitle_provider_mode = provider_mode
+
             ducking = timeline.get("audioMix", {}).get("ducking") if isinstance(timeline.get("audioMix", {}), dict) else None
             if isinstance(ducking, dict) and ducking.get("enabled", True):
                 targets = ducking.get("targetTrackIds", [])
@@ -334,6 +358,7 @@ def validate(manifest_path: Path, root: Path) -> dict:
                 "audioClips": audio_count,
                 "transitions": transition_count,
                 "titleCards": title_count,
+                "subtitleProvider": subtitle_provider_mode,
                 "burnedCaptions": burned_captions,
                 "smartDucking": ducking_enabled,
                 "durationSeconds": round(duration, 3),

@@ -1,4 +1,4 @@
 interface:
   display_name: "OpenCut Producer"
-  short_description: "Build distinct, rationale-backed video candidates with WYSIWYG review."
-  default_prompt: "Use $opencut-producer to create three distinct polished review candidates from these local video and audio assets, record strategy/rationale and per-clip rationale for each candidate, choose a safe subtitle provider, apply a suitable production preset, include schema-backed visual layer layout for titles/overlays when useful, run preflight checks, then open the OpenCut approval workspace for WYSIWYG review, preview, single-final, batch render, and local export-package handoff."
+  short_description: "Build distinct, rationale-backed video candidates with WYSIWYG review and provider-aware subtitles."
+  default_prompt: "Use $opencut-producer to create three distinct polished review candidates from these local video and audio assets, record strategy/rationale and per-clip rationale for each candidate, choose and record a safe subtitleProvider in the v2 plan, apply a suitable production preset, include schema-backed visual layer layout for titles/overlays when useful, run preflight checks, then open the OpenCut approval workspace for WYSIWYG review, preview, single-final, batch render, and local export-package handoff."

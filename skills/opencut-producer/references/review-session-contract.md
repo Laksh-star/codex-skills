@@ -312,6 +312,13 @@ Version 2 retains `timeline.clips` as the primary A-roll and adds:
       }
     ],
     "captionsAssetId": "captions",
+    "subtitleProvider": {
+      "mode": "local-whisper",
+      "status": "generated",
+      "model": "whisper-local",
+      "language": "en",
+      "notes": "Generated from local audio extraction; no transcription API upload."
+    },
     "captionStyle": {
       "mode": "both",
       "preset": "bold",
@@ -349,6 +356,14 @@ title layout fields are `x`, `y`, `width`, `height`, `opacity`, and
 `fontScale`; keep the title box inside the project canvas. Styled burn-in
 requires SRT captions; mode `both` also preserves a selectable `mov_text`
 stream. Available presets are `clean`, `bold`, and `minimal`.
+
+`subtitleProvider` is optional v2 metadata but should be present whenever the
+agent generated, selected, or attached captions. Supported modes are
+`local-whisper`, `openai-api`, `openrouter`, and `provided-captions`. Status is
+one of `selected`, `needs-generation`, `generated`, `provided`, or `failed`.
+Use `provided-captions` only when `captionsAssetId` references an attached
+SRT/VTT asset. Store provider model, language, estimated external cost, and
+notes when known; never store API keys or secrets in the plan.
 
 ## Isolation rule
 

@@ -53,8 +53,9 @@ Reuse its generated `.opencut-agent/setup.json` and `codex-mcp.toml`; do not rec
 
 ## 2. Transcribe safely
 
-Prefer local transcription when available. Support these provider modes and record
-which one was used in the handoff notes:
+Prefer local transcription when available. Support these provider modes and
+record the chosen source in each v2 candidate plan as
+`timeline.subtitleProvider` when captions or transcription are involved:
 
 - `local-whisper`: first choice when a local model/runtime is already available;
 - `openai-api`: use only after explicit upload consent;
@@ -95,6 +96,7 @@ For every candidate:
 - avoid materially misleading cuts;
 - keep source ranges within probed duration;
 - map captions onto output-timeline time, not absolute source time;
+- set `timeline.subtitleProvider.mode`, `model` when known, `language` when known, `estimatedCostUsd` when an external provider reports cost, and `notes` for any upload/quality caveat;
 - write an isolated `edit-plan.json` and unique output path;
 - add a short title and decision-useful summary;
 - add `strategy`, `rationale`, and `clipRationales` in `review-session.json`;
