@@ -365,6 +365,14 @@ Use `provided-captions` only when `captionsAssetId` references an attached
 SRT/VTT asset. Store provider model, language, estimated external cost, and
 notes when known; never store API keys or secrets in the plan.
 
+With bridge version `0.8.0` or newer, caption generation can run as a saved
+review-candidate action. The bridge extracts candidate-bounded WAV audio, calls
+the selected provider, writes an SRT into the candidate directory, attaches the
+caption asset to the edit plan, increments the candidate revision, clears any
+older preview relationship, and records caption request/success/failure audit
+events. OpenAI/OpenRouter modes must not run unless the caller explicitly sets
+`externalUploadApproved` after user consent.
+
 ## Isolation rule
 
 For candidate plan:
@@ -394,8 +402,9 @@ and that preview file exists.
 3. Compare candidates, preview source ranges, and inspect the v2 overlay/audio, transition, title-card, ducking, and caption summary.
 4. Select a candidate; this only updates manifest state.
 5. Adjust ranges, ordering, speed, volume, or caption inclusion and save a numbered revision.
-6. Render and inspect the fast preview for that exact revision.
-7. Approve the final render separately; this writes the approved plan, hashes, project record, and high-quality output.
-8. Restore the same selection, revision, notes, preview, audit, and rendered state after refresh.
+6. Generate or confirm captions for the selected saved candidate if subtitles are needed.
+7. Render and inspect the fast preview for that exact revision.
+8. Approve the final render separately; this writes the approved plan, hashes, project record, and high-quality output.
+9. Restore the same selection, revision, notes, preview, audit, and rendered state after refresh.
 
 Session IDs and approval tokens are process-local. The manifest and candidate outputs are durable.
