@@ -22,6 +22,14 @@ VALID_STATUSES = {
 VALID_BATCH_STATUSES = {"queued", "rendering", "completed", "partial", "failed"}
 VALID_BATCH_ITEM_STATUSES = {"queued", "rendering", "rendered", "failed"}
 VALID_EXPORT_PACKAGE_STATUSES = {"created", "partial"}
+VALID_CANDIDATE_STRATEGIES = {
+    "distinct-moment",
+    "narrative-segment",
+    "social-variant",
+    "archive-summary",
+    "manual",
+    "unspecified",
+}
 
 
 def fail(message: str) -> None:
@@ -123,6 +131,15 @@ def validate(manifest_path: Path, root: Path) -> dict:
             fail(f"Duplicate candidate id: {candidate_id}")
         if status not in VALID_STATUSES:
             fail(f"Invalid status for {candidate_id}: {status}")
+        strategy = candidate.get("strategy", "unspecified")
+        if not isinstance(strategy, str) or strategy not in VALID_CANDIDATE_STRATEGIES:
+            fail(f"Invalid strategy for {candidate_id}: {strategy}")
+        rationale = candidate.get("rationale", "")
+        if not isinstance(rationale, str):
+            fail(f"Candidate {candidate_id} rationale must be text")
+        clip_rationales = candidate.get("clipRationales", [])
+        if not isinstance(clip_rationales, list):
+            fail(f"Candidate {candidate_id} clipRationales must be an array")
         if not isinstance(plan_path_text, str) or not plan_path_text:
             fail(f"Candidate {candidate_id} needs planPath")
 
@@ -176,6 +193,16 @@ def validate(manifest_path: Path, root: Path) -> dict:
             if asset_kinds.get(clip["assetId"]) != "video":
                 fail(f"Candidate {candidate_id} primary clip {clip['id']} must use video")
             primary_duration += duration
+
+        for entry in clip_rationales:
+            if not isinstance(entry, dict):
+                fail(f"Candidate {candidate_id} has an invalid clip rationale")
+            clip_id = entry.get("clipId")
+            note = entry.get("note")
+            if clip_id not in clip_ids:
+                fail(f"Candidate {candidate_id} rationale references unknown clip {clip_id}")
+            if not isinstance(note, str) or not note.strip():
+                fail(f"Candidate {candidate_id} clip rationale for {clip_id} needs note")
 
         duration = primary_duration
         layer_duration = 0.0

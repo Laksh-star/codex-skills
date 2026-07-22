@@ -41,6 +41,14 @@ The source may live elsewhere under the same root. Do not place large media in t
       "id": "hook-first",
       "title": "Hook-first",
       "summary": "Fast opening and immediate payoff",
+      "strategy": "distinct-moment",
+      "rationale": "Chosen as a separate source moment with the strongest opening line and fastest payoff.",
+      "clipRationales": [
+        {
+          "clipId": "opening",
+          "note": "Starts after the setup and ends before the speaker changes topic."
+        }
+      ],
       "planPath": "opencut-projects/interview-highlights/candidates/hook-first/edit-plan.json",
       "revision": 1,
       "status": "ready-for-review"
@@ -80,6 +88,18 @@ Candidate status is one of:
 - `failed`
 
 Omit `selectedCandidateId` until the human selects a candidate.
+
+Candidate `strategy` is optional for older sessions and should be one of:
+
+- `distinct-moment` for separate candidate clips from different source moments;
+- `narrative-segment` for one longer idea intentionally split into hook/body/payoff sections;
+- `social-variant` for the same moment in a different format, style, aspect ratio, or preset;
+- `archive-summary` for context-preserving reference clips;
+- `manual` for reviewer-created candidates.
+
+New generated sessions should include `strategy`, `rationale`, and
+`clipRationales`. Every `clipRationales[].clipId` must reference a real primary
+`timeline.clips[].id` in that candidate's plan.
 
 `renderBatches` is optional for a fresh session and should normally start as
 `[]`. The bridge appends entries after an explicit **Approve batch** action:

@@ -1,4 +1,4 @@
 interface:
   display_name: "OpenCut Producer"
-  short_description: "Build, review, render, and package video candidates."
-  default_prompt: "Use $opencut-producer to create three polished review candidates from these local video and audio assets, apply a suitable production preset, run preflight checks, then open the OpenCut approval workspace for preview, single-final, batch render, and local export-package handoff."
+  short_description: "Build distinct, rationale-backed video candidates."
+  default_prompt: "Use $opencut-producer to create three distinct polished review candidates from these local video and audio assets, record strategy/rationale and per-clip rationale for each candidate, choose a safe subtitle provider, apply a suitable production preset, run preflight checks, then open the OpenCut approval workspace for preview, single-final, batch render, and local export-package handoff."

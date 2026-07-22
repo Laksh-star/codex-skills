@@ -18,10 +18,11 @@ Collect or infer:
 
 - source video path;
 - editorial goal or topic;
-- candidate count, default `3`;
+- candidate count, default `3` distinct source moments;
 - target duration, default `30–90 seconds`;
 - target aspect ratio, default source ratio;
 - caption preference, default enabled;
+- transcription provider preference, default local Whisper when available; otherwise ask before using OpenAI API, OpenRouter, or any other external service;
 - production finish, default `polished` with clean transitions, styled captions, and speech-aware music ducking when a music asset exists;
 - production preset, default `clean-interview` for interviews/talks, `bold-social` for short social clips, and `minimal-archive` for archival/reference clips;
 - optional B-roll/video overlays and independent audio assets;
@@ -52,7 +53,15 @@ Reuse its generated `.opencut-agent/setup.json` and `codex-mcp.toml`; do not rec
 
 ## 2. Transcribe safely
 
-Prefer local transcription when available. If transcription sends audio to an external service:
+Prefer local transcription when available. Support these provider modes and record
+which one was used in the handoff notes:
+
+- `local-whisper`: first choice when a local model/runtime is already available;
+- `openai-api`: use only after explicit upload consent;
+- `openrouter`: use only after explicit upload consent and model selection;
+- `provided-captions`: use when a trusted SRT/VTT or timed transcript already exists.
+
+If transcription sends audio to an external service:
 
 1. Explain which extracted audio will leave the device and which service will receive it.
 2. Obtain explicit consent before the first upload.
@@ -63,11 +72,22 @@ Skip transcription only when reliable timed text already exists or the requested
 
 ## 3. Generate differentiated candidates
 
-Create candidates with distinct editorial intent, not trivial timestamp variations. For three candidates, default to:
+Create candidates with distinct editorial intent and usually distinct source
+moments, not trivial timestamp variations and not one long clip split into
+hook/body/close unless the user explicitly requests a single narrative clip.
+For three candidates, default to:
 
 1. **Hook-first:** strongest opening and fastest payoff.
 2. **Concise core:** cleanest self-contained explanation.
 3. **Context-rich:** enough setup to preserve meaning and speaker intent.
+
+Use the `strategy` metadata to make this explicit:
+
+- `distinct-moment`: default for separate candidate clips from different source moments;
+- `narrative-segment`: use only when one longer idea is intentionally split into hook/body/payoff sections;
+- `social-variant`: same editorial moment, different style/aspect/preset;
+- `archive-summary`: more context and less aggressive social editing;
+- `manual`: reviewer-supplied or manually adjusted candidate.
 
 For every candidate:
 
@@ -76,7 +96,10 @@ For every candidate:
 - keep source ranges within probed duration;
 - map captions onto output-timeline time, not absolute source time;
 - write an isolated `edit-plan.json` and unique output path;
-- add a short title and decision-useful summary.
+- add a short title and decision-useful summary;
+- add `strategy`, `rationale`, and `clipRationales` in `review-session.json`;
+- make `rationale` explain why this candidate exists and how it differs from the other candidates;
+- make every `clipRationales[].clipId` reference a real primary `timeline.clips[].id`.
 
 Use plan version `1` for a strictly sequential single-source edit with only a
 selectable caption track. Use version `2` when the user supplies or requests
@@ -157,11 +180,13 @@ Return or open the printed `?session=<opaque-id>` URL. The browser should stream
 Keep the launcher alive while the user reviews candidates. If the bridge restarts, register the manifest again and use the new opaque URL; selection and rendered state remain in the manifest.
 
 For v2 plans, make the candidate summary name the B-roll, music, transition,
-title, caption treatment, and production preset. The current UI edits the
-primary A-roll plus existing overlay, audio, transition, title-card,
-caption-style, and ducking fields, and can apply coordinated production presets
-to those fields. The compiled preview remains the review artifact for the exact
-saved revision.
+title, caption treatment, and production preset. Make the candidate rationale
+state whether the choice is a distinct moment or a format/style variant. The
+current UI edits the primary A-roll plus existing overlay, audio, transition,
+title-card, caption-style, and ducking fields, and can apply coordinated
+production presets to those fields. The compiled preview remains the review
+artifact for the exact saved revision. Titles/logos/overlays currently use
+inspector fields, not a full drag-resize WYSIWYG canvas.
 
 ## 7. Preserve the human gate
 
@@ -197,4 +222,5 @@ After the UI reports completion:
 - If a source lies outside the configured root, choose a safe common root or ask before making a large copy.
 - If output already exists, restore the rendered state rather than overwriting it.
 - If candidate quality is weak, revise the editorial evidence and create a new candidate ID; do not silently mutate an approved plan.
+- If the user expected three different clips but the candidates are one clip split into parts, create a fresh session with `distinct-moment` candidates unless the user confirms they wanted a single narrative segmentation.
 - If native OpenCut APIs are unavailable, describe the current bridge as an FFmpeg-backed adapter, not the future OpenCut Editor API.
