@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sarvam Meeting Minutes"
+  short_description: "Transcribe meetings with Sarvam and draft minutes"
+  default_prompt: "Use $sarvam-meeting-minutes to transcribe this meeting recording with Sarvam and draft concise meeting minutes."

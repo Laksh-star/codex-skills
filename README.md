@@ -37,6 +37,7 @@ Skills for building, operating, or packaging agent-facing software workflows.
 | [`wiki-maintainer`](skills/wiki-maintainer/SKILL.md) | Build and maintain a local interlinked LLM Wiki from raw sources, with linting, Q&A, outputs, and agent exports. | Validated locally |
 | [`fork-product-development`](skills/fork-product-development/SKILL.md) | Maintain private product forks while preparing clean upstream PRs. | Validated locally |
 | [`opencut-producer`](skills/opencut-producer/SKILL.md) | Turn local videos into polished candidates with ducking, transitions, titles, styled captions, review, and approval. | Validated locally |
+| [`sarvam-meeting-minutes`](skills/sarvam-meeting-minutes/SKILL.md) | Transcribe Indian-language and code-mixed meeting recordings with Sarvam and draft evidence-backed minutes. | Validated locally |
 
 ### Plugin & Deployment Packaging
 
@@ -107,6 +108,7 @@ cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/expert-judgment-distillation "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/fork-product-development "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/opencut-producer "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/sarvam-meeting-minutes "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 Then start a new Codex session and ask for the skill by name, or ask for a task that matches its description.
@@ -188,6 +190,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/opencut-producer
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/sarvam-meeting-minutes
 ```
 
 Each published skill is validated locally before being added here.
