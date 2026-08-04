@@ -47,15 +47,19 @@ Use `--dry-run` first when checking setup without sending audio to Sarvam.
 
 ## Minutes Format
 
-Produce a concise Markdown artifact with:
+Produce a professional Markdown artifact. Prefer synthesis over transcript-shaped notes:
 
-- Meeting title, date if known, source recording path, Sarvam mode/model, and transcript file provenance.
-- Attendees or speaker labels. If names are not available, keep `SPEAKER_00`-style labels and ask the user for a speaker map.
-- Summary: 5-10 bullets focused on substantive discussion.
-- Decisions: each decision with the speaker/timestamp evidence when available.
-- Action items: owner, task, due date, status/priority, and evidence. Use `Unassigned` or `Not stated` rather than guessing.
-- Risks/blockers/open questions.
-- Follow-up message draft if the user asks for one.
+- Header: meeting title/date, source recordings, transcript provenance, Sarvam mode/model, language setting, and diarization status.
+- Executive summary: 2-4 paragraphs that explain what changed, why it matters, and what needs follow-up.
+- Key outcomes: 5-8 bullets capturing substantive outcomes, not every discussed topic.
+- Discussion notes: grouped by theme, with repeated or overlapping recording segments consolidated.
+- Decisions: table with decision, evidence, and owner.
+- Action register: table with priority, owner, action, due date, and notes.
+- Risks/watch items and open questions.
+- Suggested follow-up agenda when the conversation implies another meeting.
+- Transcript quality notes.
+
+Avoid making the output sound like a raw checklist. Use speaker/timestamp evidence where it helps accountability, but keep the main narrative polished and readable.
 
 ## Quality Rules
 
