@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mbox Knowledge Pack"
+  short_description: "Turn local mbox exports into analysis, wiki, writing, and fine-tune prep packs."
+  default_prompt: "Use $mbox-knowledge-pack to analyze this local mbox export, create a knowledge pack, and recommend what should become wiki or writing material."

@@ -8,6 +8,7 @@
 ![Content OS](https://img.shields.io/badge/Content%20OS-Codex%20Threads-14b8a6?style=for-the-badge)
 ![Competitive Intelligence](https://img.shields.io/badge/Competitive%20Intel-MCP%20%2B%20CocoIndex-0f766e?style=for-the-badge)
 ![Expert Judgment](https://img.shields.io/badge/Expert%20Judgment-Distillation%20Loop-b91c1c?style=for-the-badge)
+![Mbox Knowledge](https://img.shields.io/badge/Mbox-Knowledge%20Pack-334155?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
@@ -23,6 +24,7 @@ Skills for domain-specific ML workflows, eval design, dataset loops, and model-q
 | Skill | Purpose | Status |
 | --- | --- | --- |
 | [`expert-judgment-distillation`](skills/expert-judgment-distillation/SKILL.md) | Build expert-judgment datasets, evals, repair loops, rubric models, and case-study writeups. | Validated locally |
+| [`mbox-knowledge-pack`](skills/mbox-knowledge-pack/SKILL.md) | Convert local mbox exports into analysis packs, wiki/raw compile packets, writing outlines, and optional fine-tune prep datasets. | Validated locally |
 
 ### Agent Systems & Workflow Apps
 
@@ -61,6 +63,17 @@ The working pattern is:
 5. Keep human gates visible.
 6. Validate with real build, smoke, and browser checks where possible.
 7. Produce handoff notes that a builder or community reader can reuse.
+
+
+## Featured Workflow: Mbox Knowledge Pack
+
+The [`mbox-knowledge-pack`](skills/mbox-knowledge-pack/SKILL.md) skill turns a local email export into a private, inspectable corpus:
+
+```text
+.mbox -> messages/threads/links/attachments -> reports + SQLite -> curated wiki/writing/fine-tune prep packs
+```
+
+Use it for old sent-mail archives, self-notes, newsletters, or project email exports that need analysis before they become wiki material, writing source material, or training-data candidates. The skill keeps the raw mbox untouched, preserves evidence IDs, stages Claude/Karpathy-style wiki imports as `raw/` packets instead of final pages, and treats fine-tuning as an explicit opt-in preparation mode with redaction and audit requirements.
 
 ## Featured Workflow: Competitive Intelligence Agent
 
@@ -106,6 +119,7 @@ cp -R skills/content-os-manager "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/competitive-intelligence-agent "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/wiki-maintainer "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/expert-judgment-distillation "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R skills/mbox-knowledge-pack "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/fork-product-development "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/opencut-producer "${CODEX_HOME:-$HOME/.codex}/skills/"
 cp -R skills/sarvam-meeting-minutes "${CODEX_HOME:-$HOME/.codex}/skills/"
@@ -186,6 +200,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/expert-judgment-distillation
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  skills/mbox-knowledge-pack
+
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   skills/fork-product-development
 
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
@@ -206,7 +223,7 @@ Each published skill is validated locally before being added here.
 - Avoid repo-specific secrets, private paths, and fragile local assumptions.
 - Add a release checklist entry before publishing a skill publicly, using `docs/release-checklists/`.
 
-See [publishing guidelines](docs/publishing-guidelines.md), the [release checklist template](templates/skill-release-checklist.md), the [`competitive-intelligence-agent` checklist](docs/release-checklists/competitive-intelligence-agent.md), and the [`expert-judgment-distillation` checklist](docs/release-checklists/expert-judgment-distillation.md).
+See [publishing guidelines](docs/publishing-guidelines.md), the [release checklist template](templates/skill-release-checklist.md), the [`competitive-intelligence-agent` checklist](docs/release-checklists/competitive-intelligence-agent.md), the [`expert-judgment-distillation` checklist](docs/release-checklists/expert-judgment-distillation.md), and the [`mbox-knowledge-pack` checklist](docs/release-checklists/mbox-knowledge-pack.md).
 
 Only validated, reusable skills are published under `skills/`.
 
