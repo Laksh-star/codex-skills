@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fork Sync and Rebase"
+  short_description: "Safely review and integrate upstream into a maintained fork"
+  default_prompt: "Review this fork against upstream and report a safe integration plan before making changes."
