@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "title": "Codex Capability Maturity",
+  "capabilities": [
+    {"id":"long_context_orchestration","label":"Long-Context Orchestration","mapping":"Compaction","question":"Are complex, context-rich tasks carried through with clear evidence boundaries?","keywords":["long context","compaction","corpus","multi-step","research synthesis","large codebase","archive","knowledge base"]},
+    {"id":"memory_and_prior_context","label":"Memory And Prior Context","mapping":"Memory","question":"Are earlier decisions and reusable context deliberately carried into later work?","keywords":["memory","prior context","working history","knowledge","wiki","playbook","operating procedure","decision log"]},
+    {"id":"goal_and_stop_conditions","label":"Goals And Stop Conditions","mapping":"Goals","question":"Are tasks bounded by explicit outcomes, gates, and stopping conditions?","keywords":["goal","stop condition","acceptance criteria","completion criteria","approval gate","verify","validation","test plan","closeout"]},
+    {"id":"automation_operations","label":"Automation Operations","mapping":"Automations","question":"Are recurring tasks scheduled, monitored, and kept within clear operating rules?","keywords":["automation","scheduled","recurring","digest","rollup","monitor","reminder","cron","heartbeat"]},
+    {"id":"subagent_delegation","label":"Subagent Delegation","mapping":"Subagents","question":"Is delegation deliberate, bounded, and independently verified?","keywords":["subagent","sub-agent","delegate","delegation","helper agent","multi-agent","agent team","parallel agent"]},
+    {"id":"browser_computer_workflows","label":"Browser And Computer Workflows","mapping":"Computer History","question":"Are browser and desktop workflows completed with visible-state verification?","keywords":["browser","computer use","chrome","screenshot","visual verification","web workflow","desktop app","ui automation"]},
+    {"id":"mcp_tool_orchestration","label":"MCP And Tool Orchestration","mapping":"MCP","question":"Are connectors, scripts, and tool outputs combined coherently?","keywords":["mcp","connector","tool orchestration","plugin","api","terminal","script","github","slack","drive"]},
+    {"id":"rolling_task_history","label":"Rolling Task History","mapping":"Rolling task summaries","question":"Does task history become durable and reusable operating intelligence?","keywords":["task history","thread log","rolling summary","weekly review","activity note","archive","dashboard","review queue"]},
+    {"id":"external_action_safety","label":"External Action Safety","mapping":"Tool-heavy external actions","question":"Are public, destructive, or irreversible actions protected by authorization and receipts?","keywords":["approval","confirmation","receipt","publish","deploy","send message","external action","delete","payment","repost"]},
+    {"id":"workflow_productization","label":"Workflow Productization","mapping":"Reusable operating maturity","question":"Do repeated practices become reusable skills, tools, templates, or dashboards?","keywords":["skill","plugin","template","workflow","dashboard","productize","reusable","package","tooling"]}
+  ]
+}

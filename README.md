@@ -9,13 +9,39 @@
 ![Competitive Intelligence](https://img.shields.io/badge/Competitive%20Intel-MCP%20%2B%20CocoIndex-0f766e?style=for-the-badge)
 ![Expert Judgment](https://img.shields.io/badge/Expert%20Judgment-Distillation%20Loop-b91c1c?style=for-the-badge)
 ![Mbox Knowledge](https://img.shields.io/badge/Mbox-Knowledge%20Pack-334155?style=for-the-badge)
+![Capability Profiler](https://img.shields.io/badge/Codex-Capability%20Profiler-087e8b?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Validated-f59e0b?style=for-the-badge)
 
 Reusable Codex skills for turning real workflows into useful AI-assisted software artifacts.
 
 This repo collects practical skills built from real Codex work: workflow-first CopilotKit interfaces, repo-local plugin packaging, agent-facing competitive intelligence, and other repeatable engineering patterns that are useful beyond a single project.
 
+## Featured: Codex Capability Profiler
+
+The [`codex-capability-profiler`](plugins/codex-capability-profiler/skills/codex-capability-profiler/SKILL.md) plugin turns local Codex task history into a private capability-maturity dashboard. It reconciles every locally indexed task ID, maps task signals to ten Codex capability areas, keeps archived work visible, and provides a separate redacted export for safe sharing.
+
+![Sanitized Codex Capability Profiler dashboard](plugins/codex-capability-profiler/assets/capability-profiler-dashboard.png)
+
+The screenshot is generated from a synthetic 24-task fixture. It contains no personal task names, paths, transcripts, or local identifiers.
+
+Install the repository marketplace after cloning:
+
+```bash
+codex plugin marketplace add /absolute/path/to/codex-skills
+codex plugin add codex-capability-profiler@laksh-codex-skills
+```
+
+Start a new Codex task and ask: `Use $codex-capability-profiler to profile my local Codex capability maturity.` Reports remain local unless you explicitly choose to share them.
+
 ## Skills
+
+### Codex Operations
+
+Skills and plugins for inspecting and improving how Codex itself is used.
+
+| Skill | Purpose | Status |
+| --- | --- | --- |
+| [`codex-capability-profiler`](plugins/codex-capability-profiler/skills/codex-capability-profiler/SKILL.md) | Audit local Codex capability signals, source coverage, task classifications, and maturity trends with private and redacted reports. | Validated beta plugin |
 
 ### Model & Evaluation Workflows
 
@@ -214,9 +240,24 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
 
 Each published skill is validated locally before being added here.
 
+For the capability profiler plugin:
+
+```bash
+bash plugins/codex-capability-profiler/skills/codex-capability-profiler/scripts/smoke-test.sh
+
+uv run --with pyyaml python \
+  ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+  plugins/codex-capability-profiler/skills/codex-capability-profiler
+
+uv run --with pyyaml python \
+  ~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py \
+  plugins/codex-capability-profiler
+```
+
 ## Repository Standards
 
-- Keep each skill self-contained under `skills/<skill-name>/`.
+- Keep standalone skills self-contained under `skills/<skill-name>/`.
+- Keep plugin-bundled skills under `plugins/<plugin-name>/skills/<skill-name>/` with a validated manifest and marketplace entry.
 - Use lowercase hyphen-case skill names.
 - Keep `SKILL.md` concise and action-oriented.
 - Put deeper workflow details in `references/`.
@@ -225,7 +266,7 @@ Each published skill is validated locally before being added here.
 
 See [publishing guidelines](docs/publishing-guidelines.md), the [release checklist template](templates/skill-release-checklist.md), the [`competitive-intelligence-agent` checklist](docs/release-checklists/competitive-intelligence-agent.md), the [`expert-judgment-distillation` checklist](docs/release-checklists/expert-judgment-distillation.md), and the [`mbox-knowledge-pack` checklist](docs/release-checklists/mbox-knowledge-pack.md).
 
-Only validated, reusable skills are published under `skills/`.
+Only validated, reusable skills and plugins are published in their respective directories.
 
 ## Suggested GitHub About Fields
 

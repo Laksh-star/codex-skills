@@ -1,0 +1,29 @@
+{
+  "source": "sanitized-demo-fixture",
+  "threads": [
+    {"id":"demo-001","title":"Build release verification workflow","searchText":"Create acceptance criteria, test plan, approval gate, and deployment receipt for a reusable release workflow.","updatedAt":"2026-09-20T09:15:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-002","title":"Weekly research synthesis","searchText":"Combine a large research corpus into a knowledge base and weekly review while preserving source evidence.","updatedAt":"2026-09-19T14:20:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-003","title":"Browser checkout QA","searchText":"Use browser and screenshot verification to test a web workflow without making a payment.","updatedAt":"2026-09-18T11:10:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-004","title":"Design recurring operations digest","searchText":"Create a scheduled digest automation with a stop condition, monitor, and Slack delivery receipt.","updatedAt":"2026-09-17T06:30:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-005","title":"Package local workflow as a skill","searchText":"Productize a reusable workflow as a Codex skill and plugin with validation scripts.","updatedAt":"2026-09-16T16:45:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-006","title":"Review infrastructure change","searchText":"Require confirmation before deploy, record the approval, and verify the external action receipt.","updatedAt":"2026-09-15T12:00:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-007","title":"Delegate parallel code review","searchText":"Use two subagents for parallel review, define completion criteria, and independently verify helper output.","updatedAt":"2026-09-14T10:25:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-008","title":"Connect issue tracker and repository","searchText":"Orchestrate GitHub and an MCP connector to reconcile issues with commits and generate a dashboard.","updatedAt":"2026-09-13T08:40:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-009","title":"Recover prior architecture decisions","searchText":"Use memory, prior context, and the decision log before changing the existing workflow.","updatedAt":"2026-09-12T15:55:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-010","title":"Create task-history dashboard","searchText":"Build a searchable thread log, archive review queue, and rolling summary dashboard.","updatedAt":"2026-09-11T13:15:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-011","title":"Audit destructive file operation","searchText":"Block delete until authorization is clear and capture confirmation before the external action.","updatedAt":"2026-09-10T17:05:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-012","title":"Summarize a large codebase","searchText":"Inspect a large codebase with long context, map modules, and preserve a compact architecture summary.","updatedAt":"2026-09-09T09:35:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-013","title":"Automate support triage","searchText":"Run a recurring support monitor, use a connector, and send a message only after an approval gate.","updatedAt":"2026-09-08T07:20:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-014","title":"Create reusable project template","searchText":"Package the validated workflow into a reusable template with a test plan and closeout checklist.","updatedAt":"2026-09-07T12:45:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-015","title":"Desktop regression inspection","searchText":"Use computer use and visual verification across a desktop app, then attach screenshots.","updatedAt":"2026-09-06T11:30:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-016","title":"Refresh operating playbook","searchText":"Update the operating procedure from task history, memory, weekly review, and recent decisions.","updatedAt":"2026-09-05T18:10:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-017","title":"Test API integration","searchText":"Use an API and terminal script, verify response schemas, and stop after acceptance criteria pass.","updatedAt":"2026-09-04T14:00:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-018","title":"Plan multi-agent research","searchText":"Delegate research to a helper agent, reconcile evidence, and record a reusable knowledge workflow.","updatedAt":"2026-09-03T10:50:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-019","title":"Create publication approval flow","searchText":"Draft content, require confirmation before publish, and preserve the public action receipt.","updatedAt":"2026-09-02T08:15:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-020","title":"Build connector health monitor","searchText":"Create a scheduled MCP connector monitor with browser status verification and an incident digest.","updatedAt":"2026-09-01T06:40:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-021","title":"Archive completed experiment","searchText":"Move a finished experiment into the archive and update the task-history dashboard.","updatedAt":"2026-08-28T12:20:00Z","archived":true,"sources":["fixture"]},
+    {"id":"demo-022","title":"Review prompt library","searchText":"Compare reusable templates and package the strongest workflow guidance.","updatedAt":"2026-08-25T16:05:00Z","archived":true,"sources":["fixture"]},
+    {"id":"demo-023","title":"Inspect analytics anomaly","searchText":"Analyze an unexpected metric and record findings.","updatedAt":"2026-08-22T09:00:00Z","archived":false,"sources":["fixture"]},
+    {"id":"demo-024","title":"Draft project note","searchText":"Write a short internal project note.","updatedAt":"2026-08-20T13:30:00Z","archived":false,"sources":["fixture"]}
+  ]
+}
