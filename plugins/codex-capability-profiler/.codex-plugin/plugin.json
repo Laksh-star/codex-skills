@@ -1,0 +1,30 @@
+{
+  "name": "codex-capability-profiler",
+  "version": "0.1.0",
+  "description": "Generate a private, evidence-labeled dashboard of how Codex capabilities appear across local task history.",
+  "author": {
+    "name": "Laksh-star",
+    "url": "https://github.com/Laksh-star"
+  },
+  "homepage": "https://github.com/Laksh-star/codex-skills",
+  "repository": "https://github.com/Laksh-star/codex-skills",
+  "license": "MIT",
+  "keywords": ["codex", "skills", "capability", "maturity", "analytics", "privacy"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Capability Profiler",
+    "shortDescription": "Audit how deeply Codex capabilities are used.",
+    "longDescription": "Scans local Codex task history, reconciles source coverage, classifies workflow signals, and generates private HTML, Markdown, and JSON maturity reports with an optional redacted sharing mode.",
+    "developerName": "Laksh-star",
+    "category": "Productivity",
+    "capabilities": ["Local analysis", "Private reports", "Redacted export"],
+    "websiteURL": "https://github.com/Laksh-star/codex-skills",
+    "defaultPrompt": [
+      "Profile my local Codex capability maturity.",
+      "Generate a redacted capability report.",
+      "Audit whether every local Codex task is included."
+    ],
+    "brandColor": "#087E8B",
+    "screenshots": ["./assets/capability-profiler-dashboard.png"]
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Capability Profiler"
+  short_description: "Audit how deeply Codex capabilities are being used"
+  default_prompt: "Use $codex-capability-profiler to analyze my local Codex task history and generate a private capability maturity report."

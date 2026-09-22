@@ -1,0 +1,20 @@
+{
+  "name": "laksh-codex-skills",
+  "interface": {
+    "displayName": "Laksh Codex Skills"
+  },
+  "plugins": [
+    {
+      "name": "codex-capability-profiler",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex-capability-profiler"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
