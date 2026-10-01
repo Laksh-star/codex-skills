@@ -18,7 +18,7 @@ This repo collects practical skills built from real Codex work: workflow-first C
 
 ## Featured: Codex Capability Profiler
 
-The [`codex-capability-profiler`](plugins/codex-capability-profiler/skills/codex-capability-profiler/SKILL.md) plugin turns local Codex task history into a private capability-maturity dashboard. It reconciles every locally indexed task ID, maps task signals to ten Codex capability areas, keeps archived work visible, and provides a separate redacted export for safe sharing.
+The [`codex-capability-profiler`](plugins/codex-capability-profiler/skills/codex-capability-profiler/SKILL.md) plugin turns local Codex task history into a private capability-maturity dashboard. It reconciles ingested task IDs, maps task signals to ten Codex capability areas, keeps archived work visible, and provides a separate redacted export to review before sharing. Task titles are used by default; request context is opt-in. Source limitations and classification gaps remain visible.
 
 ![Sanitized Codex Capability Profiler dashboard](plugins/codex-capability-profiler/assets/capability-profiler-dashboard.png)
 
@@ -32,6 +32,8 @@ codex plugin add codex-capability-profiler@laksh-codex-skills
 ```
 
 Start a new Codex task and ask: `Use $codex-capability-profiler to profile my local Codex capability maturity.` Reports remain local unless you explicitly choose to share them.
+
+Version 0.2.1 is a directory release candidate. See the [package README](plugins/codex-capability-profiler/README.md), [privacy details](plugins/codex-capability-profiler/PRIVACY.md), and [release checklist](docs/release-checklists/codex-capability-profiler.md). Local validation does not establish directory acceptance.
 
 ## Skills
 

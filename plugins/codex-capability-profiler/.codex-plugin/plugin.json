@@ -1,7 +1,7 @@
 {
   "name": "codex-capability-profiler",
-  "version": "0.1.0",
-  "description": "Generate a private, evidence-labeled dashboard of how Codex capabilities appear across local task history.",
+  "version": "0.2.1",
+  "description": "Generate a private, evidence-labeled report of capability signals in local Codex task history or a supplied task export.",
   "author": {
     "name": "Laksh-star",
     "url": "https://github.com/Laksh-star"
@@ -9,22 +9,41 @@
   "homepage": "https://github.com/Laksh-star/codex-skills",
   "repository": "https://github.com/Laksh-star/codex-skills",
   "license": "MIT",
-  "keywords": ["codex", "skills", "capability", "maturity", "analytics", "privacy"],
+  "keywords": [
+    "codex",
+    "skills",
+    "capability",
+    "maturity",
+    "analytics",
+    "privacy"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Codex Capability Profiler",
-    "shortDescription": "Audit how deeply Codex capabilities are used.",
-    "longDescription": "Scans local Codex task history, reconciles source coverage, classifies workflow signals, and generates private HTML, Markdown, and JSON maturity reports with an optional redacted sharing mode.",
+    "shortDescription": "Understand your Codex workflow",
+    "longDescription": "Create a local HTML, Markdown, and JSON report from Codex task history or a supplied task export. Inspect ten heuristic capability areas, archived tasks, classification gaps, and source coverage. Task titles are used by default; request context is opt-in. Generate a separate redacted export for review before sharing. Requires Node.js 22 or later; SQLite is optional for local database access. Local state is not a stable API, and cloud conversations absent from it are outside scope. These are workflow signals, not billing metrics or a standardized expertise benchmark.",
     "developerName": "Laksh-star",
     "category": "Productivity",
-    "capabilities": ["Local analysis", "Private reports", "Redacted export"],
-    "websiteURL": "https://github.com/Laksh-star/codex-skills",
+    "capabilities": [
+      "Local analysis",
+      "Private reports",
+      "Redacted export"
+    ],
+    "websiteURL": "https://github.com/Laksh-star/codex-skills/blob/main/plugins/codex-capability-profiler/README.md",
     "defaultPrompt": [
       "Profile my local Codex capability maturity.",
       "Generate a redacted capability report.",
       "Audit whether every local Codex task is included."
     ],
     "brandColor": "#087E8B",
-    "screenshots": ["./assets/capability-profiler-dashboard.png"]
+    "logo": "./assets/logo.svg",
+    "composerIcon": "./assets/icon.svg",
+    "supportURL": "https://github.com/Laksh-star/codex-skills/blob/main/plugins/codex-capability-profiler/SUPPORT.md",
+    "privacyPolicyURL": "https://github.com/Laksh-star/codex-skills/blob/main/plugins/codex-capability-profiler/PRIVACY.md"
+  },
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/codex-capability-profiler/SKILL.md"
+    }
   }
 }

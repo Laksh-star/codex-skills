@@ -24,3 +24,5 @@ if (redactedJson.includes("Build release verification workflow") || redactedHtml
 if (!redactedJson.includes("Task 001")) throw new Error("redacted task labels missing");
 console.log("Capability profiler smoke test passed.");
 NODE
+
+node "$skill_dir/scripts/test-release-behavior.mjs"
