@@ -51,11 +51,18 @@ These are recommended prompts and expected behavior, not a claim of end-to-end a
 
 ## Public release remains pending
 
-- [ ] Approve repository publication of this candidate.
-- [ ] Make privacy/support documentation publicly reachable and verify rendered pages.
+- [x] Repository publication authorized; implementation merged in PR #2.
+- [x] Privacy/support/usage pages published on main; HTTP and rendered browser checks passed.
 - [ ] Confirm publisher identity, ownership, and directory access.
-- [ ] Validate/install through current submission tooling; resolve portability or eligibility feedback.
+- [x] Codex marketplace installation confirms version 0.2.1, enabled; the installed builder passes the synthetic sample.
+- [ ] Complete OpenAI portal validation and resolve eligibility feedback.
 - [ ] Upload the exact ZIP and complete required scans/review.
 - [ ] Explicitly publish after acceptance.
 
 No developer telemetry, MCP server, account integration, payment flow, upgrade promotion, or monetization claim is included. A paid team product requires a separate product and policy assessment.
+
+## Public release status: 1 October 2026
+
+[GitHub release 0.2.1](https://github.com/Laksh-star/codex-skills/releases/tag/capability-profiler-v0.2.1) provides the tested ZIP and SHA256SUMS. GitHub asset digest matches the locally validated archive.
+
+OpenAI draft creation is blocked at the verified developer identity requirement. No package has been uploaded there, and portal scans, review, and directory publication have not occurred. Resolve the account prerequisite before continuing; GitHub publication is separate from directory availability.
