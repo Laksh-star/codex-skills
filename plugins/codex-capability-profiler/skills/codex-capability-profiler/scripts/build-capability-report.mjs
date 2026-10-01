@@ -17,6 +17,14 @@ const outDir = path.resolve(args.out || "codex-capability-report");
 const rubricPath = path.resolve(args.rubric || path.join(skillDir, "references", "default-rubric.json"));
 const rubric = readJson(rubricPath);
 const previous = readJsonIfExists(path.join(outDir, "report.json"), null);
+if (previous?.meta && previous.meta.redacted !== Boolean(args.redacted)) {
+  throw new Error("Use separate output directories for private and redacted reports.");
+}
+for (const name of ["report.json", "report.md", "report.html"]) {
+  const target = path.join(outDir, name);
+  if (fs.existsSync(target) && fs.lstatSync(target).isSymbolicLink()) throw new Error("Report output files must not be symbolic links.");
+  if (args.input && (path.resolve(args.input) === target || (fs.existsSync(target) && fs.existsSync(args.input) && fs.realpathSync(args.input) === fs.realpathSync(target)))) throw new Error("Choose an output directory that will not overwrite the input file.");
+}
 const loaded = args.input
   ? loadInput(path.resolve(args.input))
   : loadLocalHistory(path.resolve(args.codexHome || process.env.CODEX_HOME || path.join(os.homedir(), ".codex")));
@@ -38,7 +46,8 @@ fs.writeFileSync(path.join(outDir, "report.md"), renderMarkdown(report));
 fs.writeFileSync(path.join(outDir, "report.html"), renderHtml(report));
 
 console.log(`Capability report written to ${outDir}`);
-console.log(`Coverage: ${report.summary.totalTasks}/${report.coverage.expectedTasks} tasks`);
+console.log(`ID reconciliation: ${report.summary.totalTasks}/${report.coverage.expectedTasks} tasks`);
+console.log(`Source scope: ${report.meta.sourceScope}`);
 console.log(`Classified: ${report.summary.classifiedTasks}/${report.summary.totalTasks}`);
 console.log(`Average maturity signal: ${report.summary.averageScore}/5`);
 console.log(`Privacy mode: ${report.meta.redacted ? "redacted" : "private local"}`);
@@ -72,7 +81,7 @@ Options:
   --codex-home <dir>    Override CODEX_HOME discovery
   --rubric <json>       Override the default capability rubric
   --redacted            Remove titles, IDs, paths, and request context
-  --include-context     Show bounded request context in the private HTML log
+  --include-context     Classify using and retain bounded context (private output only)
   --timezone <zone>     Display timezone (default: system timezone)
   --help                Show this help`);
 }
@@ -92,11 +101,14 @@ function readJsonIfExists(filePath, fallback) {
 
 function loadInput(filePath) {
   const payload = readJson(filePath);
-  const rows = Array.isArray(payload) ? payload : payload.threads;
+  const rows = Array.isArray(payload) ? payload : payload?.threads;
   if (!Array.isArray(rows)) throw new Error("Input JSON must be an array or an object with a threads array");
+  if (!rows.length) throw new Error("Input contains no tasks; provide a non-empty threads array.");
   const byId = new Map();
   rows.forEach((row, index) => {
+    if (!row || typeof row !== "object" || Array.isArray(row)) throw new Error(`Input task ${index + 1} must be an object.`);
     const thread = normalizeThread(row, index);
+    if (byId.has(thread.id)) throw new Error(`Duplicate task ID at input row ${index + 1}; provide one row per task.`);
     byId.set(thread.id, thread);
   });
   return {
@@ -104,7 +116,9 @@ function loadInput(filePath) {
     expectedIds: new Set(byId.keys()),
     source: {
       mode: "input",
-      label: payload.source || path.basename(filePath),
+      label: typeof payload.source === "string" ? cleanText(payload.source) : path.basename(filePath),
+      scope: "supplied-input",
+      warnings: [],
       appDatabaseTasks: 0,
       sessionIndexTasks: 0,
       inputTasks: byId.size,
@@ -116,8 +130,11 @@ function loadInput(filePath) {
 function loadLocalHistory(codexHome) {
   const sessionIndexPath = path.join(codexHome, "session_index.jsonl");
   const appDatabasePath = findLatestSqlite(codexHome);
-  const appThreads = appDatabasePath ? readSqliteThreads(appDatabasePath) : new Map();
-  const sessionThreads = readSessionIndex(sessionIndexPath);
+  const warnings = [];
+  const appThreads = appDatabasePath ? readSqliteThreads(appDatabasePath, warnings) : new Map();
+  if (!appDatabasePath) warnings.push("No local task database found; only the session index is observable.");
+  const sessionThreads = readSessionIndex(sessionIndexPath, warnings);
+  if (!fs.existsSync(sessionIndexPath)) warnings.push("Session index unavailable; task names could not be cross-checked.");
   const ids = new Set([...appThreads.keys(), ...sessionThreads.keys()]);
   const threads = [...ids].map((id, index) => mergeThread(id, appThreads.get(id), sessionThreads.get(id), index));
   if (!threads.length) {
@@ -129,6 +146,8 @@ function loadLocalHistory(codexHome) {
     source: {
       mode: "local-codex",
       label: "Local Codex history",
+      scope: warnings.length ? "reduced-local" : "local-sources",
+      warnings,
       appDatabasePath,
       sessionIndexPath: fs.existsSync(sessionIndexPath) ? sessionIndexPath : null,
       appDatabaseTasks: appThreads.size,
@@ -150,7 +169,7 @@ function findLatestSqlite(codexHome) {
     .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0] || null;
 }
 
-function readSqliteThreads(databasePath) {
+function readSqliteThreads(databasePath, warnings) {
   try {
     const columns = querySqliteJson(databasePath, "pragma table_info(threads);");
     const names = new Set(columns.map((column) => column.name));
@@ -180,27 +199,30 @@ function readSqliteThreads(databasePath) {
       }];
     }));
   } catch (error) {
-    console.warn(`Warning: app database unavailable (${error.message}); continuing with session_index.jsonl.`);
+    warnings.push("Task database could not be read (SQLite unavailable, invalid file, or unsupported schema); using any available session index. Database task coverage is unknown.");
+    console.warn("Warning: task database could not be read; using any available session index. Database coverage is unknown.");
     return new Map();
   }
 }
 
 function querySqliteJson(databasePath, query) {
-  const stdout = execFileSync("sqlite3", ["-json", databasePath, query], {
+  const stdout = execFileSync("sqlite3", ["-readonly", "-json", databasePath, query], {
     encoding: "utf8",
     maxBuffer: 32 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
   });
   return JSON.parse(stdout || "[]");
 }
 
-function readSessionIndex(filePath) {
+function readSessionIndex(filePath, warnings) {
   const byId = new Map();
+  let skippedRows = 0;
   if (!fs.existsSync(filePath)) return byId;
   for (const line of fs.readFileSync(filePath, "utf8").split(/\r?\n/)) {
     if (!line.trim()) continue;
     try {
       const row = JSON.parse(line);
-      if (!row.id) continue;
+      if (!row?.id) { skippedRows += 1; continue; }
       const thread = {
         id: String(row.id),
         title: cleanText(row.thread_name || row.title || row.id),
@@ -213,9 +235,10 @@ function readSessionIndex(filePath) {
       const prior = byId.get(thread.id);
       if (!prior || dateValue(thread.updatedAt) >= dateValue(prior.updatedAt)) byId.set(thread.id, thread);
     } catch {
-      // One malformed JSONL row must not invalidate the full local scan.
+      skippedRows += 1;
     }
   }
+  if (skippedRows) warnings.push(`Session index skipped ${skippedRows} malformed or unidentified rows; their task coverage is unknown.`);
   return byId;
 }
 
@@ -236,7 +259,7 @@ function mergeThread(id, appThread, sessionThread, index) {
 function normalizeThread(row, index) {
   return {
     id: String(row.id || `input-${index + 1}`),
-    title: cleanText(row.title || row.thread_name || `Task ${index + 1}`),
+    title: truncate(row.title || row.thread_name || `Task ${index + 1}`, 240),
     searchText: cleanText(row.searchText || row.search_text || row.title || row.thread_name || "").slice(0, 1600),
     updatedAt: timestampToIso(row.updatedAt || row.updated_at),
     archived: Boolean(row.archived),
@@ -269,7 +292,7 @@ function cleanText(value) {
 function buildReport(loaded, rubricData, options) {
   const now = new Date();
   const sorted = loaded.threads
-    .map((thread) => ({ ...thread, capabilities: classify(thread, rubricData.capabilities) }))
+    .map((thread) => ({ ...thread, capabilities: classify({ ...thread, searchText: options.includeContext ? thread.searchText : "" }, rubricData.capabilities) }))
     .sort((a, b) => dateValue(b.updatedAt) - dateValue(a.updatedAt));
   const logIds = new Set(sorted.map((thread) => thread.id));
   const missingIds = [...loaded.expectedIds].filter((id) => !logIds.has(id));
@@ -305,12 +328,16 @@ function buildReport(loaded, rubricData, options) {
     };
   });
   const averageScore = round1(capabilities.reduce((sum, item) => sum + item.score, 0) / Math.max(1, capabilities.length));
-  const priorAverage = Number(options.previous?.summary?.averageScore);
+  const comparable = options.previous?.meta?.rubricVersion === rubricData.version
+    && options.previous?.meta?.sourceMode === loaded.source.mode
+    && options.previous?.meta?.signalBasis === (options.includeContext ? "titles-and-context" : "titles")
+    && options.previous?.meta?.redacted === options.redacted;
+  const priorAverage = comparable ? Number(options.previous?.summary?.averageScore) : NaN;
   const delta = Number.isFinite(priorAverage) ? round1(averageScore - priorAverage) : null;
   const displayThreads = sorted.map((thread, index) => options.redacted
     ? {
       title: `Task ${String(index + 1).padStart(3, "0")}`,
-      updatedAt: thread.updatedAt,
+      updatedAt: null,
       archived: thread.archived,
       sources: ["local"],
       capabilities: thread.capabilities,
@@ -318,7 +345,7 @@ function buildReport(loaded, rubricData, options) {
     : {
       id: thread.id,
       title: thread.title,
-      searchText: thread.searchText,
+      ...(options.includeContext ? { searchText: thread.searchText } : {}),
       updatedAt: thread.updatedAt,
       archived: thread.archived,
       sources: thread.sources,
@@ -330,9 +357,12 @@ function buildReport(loaded, rubricData, options) {
       generatedAt: now.toISOString(),
       rubricVersion: rubricData.version,
       sourceMode: loaded.source.mode,
-      sourceLabel: loaded.source.label,
+      sourceLabel: options.redacted ? "Redacted task source" : loaded.source.label,
+      sourceScope: loaded.source.scope,
+      sourceWarnings: loaded.source.warnings,
       redacted: options.redacted,
       includeContext: options.includeContext && !options.redacted,
+      signalBasis: options.includeContext ? "titles-and-context" : "titles",
       timezone: options.timezone,
       limitations: loaded.source.limitations,
     },
@@ -391,15 +421,17 @@ function renderMarkdown(report) {
     `- Tasks classified: ${report.summary.classifiedTasks}`,
     `- Tasks unclassified: ${report.summary.unclassifiedTasks}`,
     `- Coverage reconciliation: ${report.coverage.complete ? "complete" : "incomplete"} (${report.coverage.threadLogTasks}/${report.coverage.expectedTasks})`,
+    `- Source scope: ${report.meta.sourceScope}`,
+    ...report.meta.sourceWarnings.map((warning) => `- Source warning: ${warning}`),
     `- Archived tasks included: ${report.coverage.archivedTasks}`,
     "",
-    "> This is a heuristic workflow-signal report, not a standardized expertise benchmark.",
+    "> This is a heuristic workflow-signal report, not a standardized expertise benchmark. ID reconciliation does not prove that every possible history source was readable.",
     "",
     "## Capability Matrix",
     "",
     "| Capability | Feature mapping | Score | Level | Task signals | Confidence |",
     "| --- | --- | ---: | --- | ---: | --- |",
-    ...report.capabilities.map((item) => `| ${item.label} | ${item.mapping} | ${item.score}/5 | ${item.level} | ${item.threadCount} (${item.threadPct}%) | ${item.confidence} |`),
+    ...report.capabilities.map((item) => `| ${escapeMarkdown(item.label)} | ${escapeMarkdown(item.mapping)} | ${item.score}/5 | ${item.level} | ${item.threadCount} (${item.threadPct}%) | ${item.confidence} |`),
     "",
     "## Latest Tasks",
     "",
@@ -437,7 +469,7 @@ function renderHtml(report) {
       : "";
     return `
       <tr data-classification="${classified}" data-lifecycle="${lifecycle}" data-capabilities="${escapeHtml(thread.capabilities.join(" "))}" data-search="${escapeHtml(searchText)}">
-        <td>${escapeHtml(formatDate(thread.updatedAt, report.meta.timezone))}</td>
+        <td>${report.meta.redacted ? "Hidden" : escapeHtml(formatDate(thread.updatedAt, report.meta.timezone))}</td>
         <td><strong>${escapeHtml(thread.title)}</strong>${context}</td>
         <td><span class="status ${lifecycle}">${lifecycle}</span></td>
         <td>${escapeHtml(thread.capabilities.map(shortCapability).join(", ") || "unclassified")}</td>
@@ -526,7 +558,7 @@ function renderHtml(report) {
   </style>
 </head>
 <body>
-  <header><div class="topbar"><div class="brand"><div class="mark">CP</div><div><div class="eyebrow">Local workflow intelligence</div><h1>Codex Capability Profiler</h1></div></div><div class="privacy">${report.meta.redacted ? "Redacted shareable report" : "Private local report"}</div></div></header>
+  <header><div class="topbar"><div class="brand"><div class="mark">CP</div><div><div class="eyebrow">Local workflow intelligence</div><h1>Codex Capability Profiler</h1></div></div><div class="privacy">${report.meta.redacted ? "Redacted report · review before sharing" : "Private local report"}</div></div></header>
   <main>
     <section class="intro"><div><strong>Capability maturity, grounded in observable task signals.</strong><p>Maps recurring Codex workflows to ten capability areas. Scores are heuristic and designed for longitudinal self-review, not cross-user ranking.</p></div><span class="timestamp">Generated ${escapeHtml(formatDate(report.meta.generatedAt, report.meta.timezone))}</span></section>
     <section class="metrics">
@@ -536,7 +568,7 @@ function renderHtml(report) {
       <div class="metric"><strong>${report.summary.unclassifiedTasks}</strong><span>Review queue</span></div>
       <div class="metric"><strong>${report.coverage.archivedTasks}</strong><span>Archived included</span></div>
     </section>
-    <section class="coverage"><strong>${report.coverage.complete ? "Complete source reconciliation" : "Coverage gap detected"}</strong><span>${report.coverage.threadLogTasks} of ${report.coverage.expectedTasks} indexed task IDs are represented in the log.</span></section>
+    <section class="coverage"><strong>${report.meta.sourceWarnings.length ? "Reduced source coverage" : "Complete ID reconciliation"}</strong><span>${report.coverage.threadLogTasks} of ${report.coverage.expectedTasks} ingested task IDs are represented. ${escapeHtml(report.meta.sourceWarnings.join(" "))}</span></section>
     <nav class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true" aria-controls="overview">Overview</button><button class="tab" role="tab" aria-selected="false" aria-controls="thread-log">Thread Log</button></nav>
     <section id="overview" role="tabpanel">
       <div class="overview-grid">
@@ -551,7 +583,7 @@ function renderHtml(report) {
         <label>Classification<select id="classification-filter"><option value="all">All tasks</option><option value="classified">Classified</option><option value="unclassified">Unclassified</option></select></label>
         <label>Lifecycle<select id="lifecycle-filter"><option value="all">All states</option><option value="active">Active</option><option value="archived">Archived</option></select></label>
         <label>Capability<select id="capability-filter"><option value="all">All capabilities</option>${capabilityOptions}</select></label>
-        <label>Search<input id="task-search" type="search" placeholder="Search tasks and local context"></label>
+        <label>Search<input id="task-search" type="search" placeholder="Search report tasks"></label>
         <span id="log-count"></span>
       </div>
       <table id="thread-table"><thead><tr><th>Updated</th><th>Task</th><th>Lifecycle</th><th>Capability signals</th></tr></thead><tbody>${threadRows}</tbody></table>
@@ -627,5 +659,5 @@ function escapeHtml(value) {
 }
 
 function escapeMarkdown(value) {
-  return String(value ?? "").replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
+  return escapeHtml(value).replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 }
