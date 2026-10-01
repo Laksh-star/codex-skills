@@ -1,6 +1,6 @@
 {
   "name": "codex-capability-profiler",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Generate a private, evidence-labeled report of capability signals in local Codex task history or a supplied task export.",
   "author": {
     "name": "Laksh-star",
@@ -31,18 +31,17 @@
           "Private reports",
           "Redacted export"
         ],
-        "websiteURL": "https://github.com/Laksh-star/codex-skills",
+        "websiteURL": "https://github.com/Laksh-star/codex-skills/blob/main/plugins/codex-capability-profiler/README.md",
         "defaultPrompt": [
           "Profile my local Codex capability maturity.",
           "Generate a redacted capability report.",
           "Audit whether every local Codex task is included."
         ],
         "brandColor": "#087E8B",
-        "screenshots": [
-          "./assets/capability-profiler-dashboard.png"
-        ],
         "logo": "./assets/logo.svg",
-        "composerIcon": "./assets/icon.svg"
+        "composerIcon": "./assets/icon.svg",
+        "supportURL": "https://github.com/Laksh-star/codex-skills/blob/main/plugins/codex-capability-profiler/SUPPORT.md",
+        "privacyPolicyURL": "https://github.com/Laksh-star/codex-skills/blob/main/plugins/codex-capability-profiler/PRIVACY.md"
       },
       "onboardingSkill": "./skills/codex-capability-profiler/SKILL.md"
     }

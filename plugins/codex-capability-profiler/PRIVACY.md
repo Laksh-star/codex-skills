@@ -1,6 +1,6 @@
 # Capability Profiler privacy
 
-Version 0.2.0 · 1 October 2026
+Version 0.2.1 · 1 October 2026
 
 ## What the builder reads
 

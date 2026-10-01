@@ -15,8 +15,8 @@ from xml.etree import ElementTree
 ROOT_FILES = {
     "plugin.json", ".codex-plugin/plugin.json", "LICENSE", "README.md",
     "PRIVACY.md", "SUPPORT.md", "assets/icon.svg", "assets/logo.svg",
-    "assets/capability-profiler-dashboard.png",
 }
+DEV_FILES = {"assets/capability-profiler-dashboard.png"}
 SKILL_FILES = {
     "SKILL.md", "agents/openai.yaml", "assets/sample-threads.json",
     "references/data-sources.md", "references/default-rubric.json",
@@ -34,7 +34,7 @@ def require(condition, message):
 def build(package, output):
     allowed = ROOT_FILES | {PREFIX + name for name in SKILL_FILES}
     files = {str(p.relative_to(package)) for p in package.rglob("*") if p.is_file()}
-    require(files == allowed, f"Package allowlist mismatch: extra={files - allowed}, missing={allowed - files}")
+    require(files == allowed | DEV_FILES, f"Package allowlist mismatch: extra={files - allowed - DEV_FILES}, missing={(allowed | DEV_FILES) - files}")
     require(not any(p.is_symlink() for p in package.rglob("*")), "Symlinks are not allowed")
     portable = json.loads((package / "plugin.json").read_text())
     compat = json.loads((package / ".codex-plugin/plugin.json").read_text())
@@ -46,9 +46,10 @@ def build(package, output):
     require(extension["interface"] == compat["interface"], "Interface metadata disagrees")
     require(extension["onboardingSkill"] == compat["extensions"]["com.openai"]["onboardingSkill"], "Onboarding paths disagree")
     interface = extension["interface"]
+    require("screenshots" not in interface, "Skills-only submission must not declare screenshots")
     for key in ("displayName", "shortDescription"):
         require(0 < len(interface[key]) <= 30, f"Invalid {key} length")
-    for reference in [interface["logo"], interface["composerIcon"], extension["onboardingSkill"], *interface["screenshots"]]:
+    for reference in [interface["logo"], interface["composerIcon"], extension["onboardingSkill"]]:
         require(reference.startswith("./") and reference[2:] in allowed, f"Invalid asset reference: {reference}")
     for name in ("assets/logo.svg", "assets/icon.svg"):
         svg = ElementTree.parse(package / name).getroot()

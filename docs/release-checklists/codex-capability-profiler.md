@@ -1,4 +1,4 @@
-# Codex Capability Profiler 0.2.0 release checklist
+# Codex Capability Profiler 0.2.1 release checklist
 
 This is a skills-only release candidate. Local validation does not establish OpenAI directory acceptance. See the [plugin README](../../plugins/codex-capability-profiler/README.md) and [privacy policy](../../plugins/codex-capability-profiler/PRIVACY.md).
 
@@ -25,7 +25,7 @@ uv run --with pyyaml python "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-cr
 python3 tools/build-profiler-release.py --out /your/release-output
 ```
 
-The packer checks matching manifests, asset references, icon dimensions, public name lengths, version, local path exclusions, and an exact file allowlist. It produces a deterministic ZIP, SHA256SUMS, and package-receipt.json. It is a local structural check, not OpenAI's submission validator.
+The packer checks matching manifests, asset references, icon dimensions, public name lengths, version, local path exclusions, and an exact file allowlist. It excludes the repository-only synthetic screenshot because skills-only directory submissions cannot declare screenshots. It produces a deterministic ZIP, SHA256SUMS, and package-receipt.json. It is a local structural check, not OpenAI's submission validator.
 
 Validate plugin.json against the official schema at https://agent-plugins.org/schemas/1.0.0/plugin.schema.json using a JSON Schema validator. OpenAI extension fields need the current directory tooling/review as well.
 
@@ -34,7 +34,7 @@ Validate plugin.json against the official schema at https://agent-plugins.org/sc
 - [x] Portable manifest passes the official Agent Plugins 1.0.0 schema.
 - [x] Desktop (1440px) and mobile (390px) checks pass without page errors or page overflow.
 - [x] Search, archived and unclassified filters work against the synthetic fixture.
-- [x] Live local-history scan reconciles 983/983 task IDs; outputs are outside the repository and ZIP.
+- [x] Live local-history scan reconciles the ingested task IDs; outputs are outside the repository and ZIP.
 
 Extract the final ZIP into a fresh directory and run its packaged smoke script before submission. Use its receipt hash to identify the exact archive.
 

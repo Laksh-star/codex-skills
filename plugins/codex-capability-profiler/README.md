@@ -1,5 +1,7 @@
 # Codex Capability Profiler
 
+Version 0.2.1. An independent community plugin; not affiliated with or endorsed by OpenAI.
+
 Understand recurring Codex workflows using evidence from local task history or a supplied export. Generate local HTML, Markdown, and JSON reports with ten heuristic capability areas, a searchable task log, archived tasks, and explicit source-coverage warnings.
 
 Requires **Node.js 22 or later**. `sqlite3` is optional for reading the local task database; without it, the report explains the reduced scope. No API key, account registration, hosted service, or network connection is required by the builder.

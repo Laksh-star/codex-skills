@@ -33,7 +33,7 @@ codex plugin add codex-capability-profiler@laksh-codex-skills
 
 Start a new Codex task and ask: `Use $codex-capability-profiler to profile my local Codex capability maturity.` Reports remain local unless you explicitly choose to share them.
 
-Version 0.2.0 is a directory release candidate. See the [package README](plugins/codex-capability-profiler/README.md), [privacy details](plugins/codex-capability-profiler/PRIVACY.md), and [release checklist](docs/release-checklists/codex-capability-profiler.md). Local validation does not establish directory acceptance.
+Version 0.2.1 is a directory release candidate. See the [package README](plugins/codex-capability-profiler/README.md), [privacy details](plugins/codex-capability-profiler/PRIVACY.md), and [release checklist](docs/release-checklists/codex-capability-profiler.md). Local validation does not establish directory acceptance.
 
 ## Skills
 
